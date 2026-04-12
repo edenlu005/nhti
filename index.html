@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NHTI · 牛马人格诊断</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0d0d0d;
+      --card: #161616;
+      --card2: #1e1e1e;
+      --border: #2a2a2a;
+      --gold: #c9a84c;
+      --gold-dim: #8a7030;
+      --text: #e2e2e2;
+      --text-dim: #888;
+      --red: #d94f4f;
+      --green: #4fad7c;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .screen { display: none; width: 100%; max-width: 680px; animation: fadeIn .35s ease; }
+    .screen.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ── LANDING ── */
+    .landing { text-align: center; padding: 60px 20px; }
+    .badge {
+      display: inline-block;
+      background: var(--gold-dim);
+      color: var(--gold);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      padding: 5px 12px;
+      border-radius: 4px;
+      margin-bottom: 28px;
+      text-transform: uppercase;
+    }
+    .landing h1 {
+      font-size: clamp(38px, 8vw, 64px);
+      font-weight: 900;
+      letter-spacing: -1px;
+      line-height: 1;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+    .landing h1 span { color: var(--gold); }
+    .landing .sub {
+      font-size: 14px;
+      color: var(--text-dim);
+      margin-bottom: 40px;
+      line-height: 1.7;
+    }
+    .landing .sub em {
+      color: var(--text);
+      font-style: normal;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      margin-bottom: 48px;
+    }
+    .stat { text-align: center; }
+    .stat .num { font-size: 24px; font-weight: 800; color: var(--gold); }
+    .stat .label { font-size: 11px; color: var(--text-dim); margin-top: 2px; letter-spacing: 1px; }
+
+    .divider { height: 1px; background: var(--border); margin: 0 auto 48px; max-width: 200px; }
+
+    .btn-start {
+      background: var(--gold);
+      color: #000;
+      border: none;
+      padding: 16px 48px;
+      font-size: 16px;
+      font-weight: 800;
+      border-radius: 8px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: transform .15s, box-shadow .15s;
+    }
+    .btn-start:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,168,76,.35); }
+    .btn-start:active { transform: translateY(0); }
+
+    .disclaimer {
+      margin-top: 28px;
+      font-size: 11px;
+      color: var(--text-dim);
+      line-height: 1.6;
+    }
+
+    /* ── QUIZ ── */
+    .quiz-header { margin-bottom: 32px; }
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+    .progress-meta .q-num { font-weight: 700; color: var(--text); }
+    .progress-bar {
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--gold);
+      border-radius: 2px;
+      transition: width .4s cubic-bezier(.4,0,.2,1);
+    }
+
+    .question-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 36px 32px;
+      margin-bottom: 20px;
+    }
+    .dim-tag {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--gold-dim);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .question-text {
+      font-size: 17px;
+      font-weight: 600;
+      line-height: 1.65;
+      color: #fff;
+    }
+
+    .options { display: flex; flex-direction: column; gap: 12px; }
+    .opt-btn {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+      font-size: 15px;
+      color: var(--text);
+      cursor: pointer;
+      text-align: left;
+      line-height: 1.55;
+      transition: border-color .15s, background .15s, transform .1s;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .opt-btn:hover { border-color: var(--gold); background: #222; transform: translateX(4px); }
+    .opt-btn .opt-label {
+      min-width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-dim);
+      flex-shrink: 0;
+      margin-top: 1px;
+      transition: background .15s, color .15s;
+    }
+    .opt-btn:hover .opt-label { background: var(--gold); color: #000; }
+
+    /* ── RESULT ── */
+    .result { padding-bottom: 40px; }
+    .result-header {
+      text-align: center;
+      padding: 48px 20px 40px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 36px;
+    }
+    .result-badge {
+      display: inline-block;
+      background: rgba(201,168,76,.12);
+      border: 1px solid var(--gold-dim);
+      color: var(--gold);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      padding: 5px 14px;
+      border-radius: 4px;
+      margin-bottom: 24px;
+      text-transform: uppercase;
+    }
+    .result-stage {
+      font-size: 34px;
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+    .result-dot { color: var(--gold); margin: 0 4px; }
+    .result-state {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-dim);
+      margin-bottom: 28px;
+    }
+    .result-desc {
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--text);
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 24px;
+      background: var(--card);
+      border-radius: 12px;
+      border-left: 3px solid var(--gold);
+      text-align: left;
+    }
+
+    .result-dims {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+    .dim-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+    }
+    .dim-card .dc-label { font-size: 10px; color: var(--text-dim); letter-spacing: 1px; margin-bottom: 8px; text-transform: uppercase; }
+    .dim-card .dc-result { font-size: 16px; font-weight: 800; color: var(--gold); margin-bottom: 4px; }
+    .dim-card .dc-bar-wrap { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; margin-top: 8px; }
+    .dim-card .dc-bar { height: 100%; background: var(--gold); border-radius: 2px; }
+    .dim-card .dc-score { font-size: 11px; color: var(--text-dim); margin-top: 6px; }
+
+    .share-section { text-align: center; margin-top: 36px; }
+    .share-text { font-size: 13px; color: var(--text-dim); margin-bottom: 16px; }
+    .share-copy {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.6;
+      margin-bottom: 20px;
+      text-align: left;
+      cursor: pointer;
+      transition: border-color .15s;
+    }
+    .share-copy:hover { border-color: var(--gold); }
+    .copy-hint { font-size: 11px; color: var(--text-dim); margin-top: 6px; text-align: center; }
+
+    .btn-retake {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      padding: 12px 32px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: border-color .15s, color .15s;
+    }
+    .btn-retake:hover { border-color: var(--gold); color: var(--gold); }
+
+    .copied-toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--gold);
+      color: #000;
+      padding: 10px 24px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s, transform .25s;
+    }
+    .copied-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 480px) {
+      .question-card { padding: 24px 20px; }
+      .result-dims { grid-template-columns: 1fr; }
+      .stat-row { gap: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════ LANDING ═══════════════ -->
+<div id="screen-landing" class="screen active">
+  <div class="landing">
+    <div class="badge">2026 · 牛马人格研究所</div>
+    <h1>N<span>H</span>TI</h1>
+    <p style="font-size:18px; font-weight:700; color:#aaa; margin-bottom:12px; letter-spacing:2px;">牛马人格诊断</p>
+    <p class="sub">
+      比 MBTI 更懂你，<em>因为它只测你还剩多少。</em><br>
+      4 个维度 · 40 道题 · 16 种牛马形态
+    </p>
+
+    <div class="stat-row">
+      <div class="stat"><div class="num">40</div><div class="label">道测试题</div></div>
+      <div class="stat"><div class="num">16</div><div class="label">种诊断结果</div></div>
+      <div class="stat"><div class="num">~5</div><div class="label">分钟完成</div></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <button class="btn-start" onclick="startQuiz()">开始诊断</button>
+
+    <p class="disclaimer">
+      本测试纯属娱乐整活，结果不构成任何医学或职业建议。<br>
+      如测出结果后感到共鸣，属于正常社会现象。
+    </p>
+  </div>
+</div>
+
+<!-- ═══════════════ QUIZ ═══════════════ -->
+<div id="screen-quiz" class="screen">
+  <div class="quiz-header">
+    <div class="progress-meta">
+      <span class="q-num" id="q-counter">第 1 题 / 共 40 题</span>
+      <span id="q-pct">0%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+
+  <div class="question-card">
+    <div class="dim-tag" id="dim-tag">维度评估</div>
+    <div class="question-text" id="question-text">题目加载中...</div>
+  </div>
+
+  <div class="options" id="options-container"></div>
+</div>
+
+<!-- ═══════════════ RESULT ═══════════════ -->
+<div id="screen-result" class="screen">
+  <div class="result">
+    <div class="result-header">
+      <div class="result-badge">NHTI 诊断报告</div>
+      <div class="result-stage">
+        <span id="r-stage"></span><span class="result-dot">·</span><span id="r-state"></span>
+      </div>
+      <div class="result-state" id="r-code"></div>
+      <div class="result-desc" id="r-desc"></div>
+    </div>
+
+    <div class="result-dims" id="r-dims"></div>
+
+    <div class="share-section">
+      <p class="share-text">复制以下内容分享给朋友，让他们也来测一测 👇</p>
+      <div class="share-copy" id="share-text-box" onclick="copyShare()">
+        <span id="share-content"></span>
+        <p class="copy-hint">点击复制</p>
+      </div>
+      <br>
+      <button class="btn-retake" onclick="retake()">再测一次</button>
+    </div>
+  </div>
+</div>
+
+<div class="copied-toast" id="toast">已复制到剪贴板 ✓</div>
+
+<script>
+// ═══ 题库（按维度交错排列：KT → XM → YR → DZ 循环）═══
+const questions = [
+  // 第1轮
+  { dim:'KT', text:'周五下午5点，老板发来消息"这个周末能把方案赶出来吗？"，你第一反应是：', a:'已经在想从哪里开始了', b:'手机屏幕暗了，我也跟着暗了' },
+  { dim:'XM', text:'加班到很晚终于回到家，你的感受是：', a:'有点委屈或愤怒，这不正常', b:'正常，反正都这样' },
+  { dim:'YR', text:'项目失败了，首先浮现在脑海里的念头是：', a:'这事本来就不该这么安排', b:'下次得换个方法' },
+  { dim:'DZ', text:'工作压力特别大的时候，你会：', a:'跟朋友/家人倾诉，或者发朋友圈', b:'自己消化，不太说出口' },
+  // 第2轮
+  { dim:'KT', text:'同事说他昨天加班到12点，你：', a:'不自觉地开始回忆自己上次几点走的', b:'心想这有什么好说的' },
+  { dim:'XM', text:'连续高压工作一个月后，你：', a:'明显感觉到疲惫，需要休息', b:'没什么特别感觉，继续' },
+  { dim:'YR', text:'工资涨幅跑不过通货膨胀，你：', a:'觉得这个社会/公司/经济有问题', b:'看看哪里能省钱或者多赚点' },
+  { dim:'DZ', text:'被人误解了，你：', a:'想解释清楚', b:'算了，解释也麻烦' },
+  // 第3轮
+  { dim:'KT', text:'你制定了"每天6点起床健身"的计划，第三天闹钟响了：', a:'挣扎一下，最终爬起来', b:'已经把闹钟改成8点了' },
+  { dim:'XM', text:'被领导当众批评，你当时：', a:'有明显情绪波动（尴尬/愤怒/难受）', b:'面部表情基本没变化' },
+  { dim:'YR', text:'被不合理的规定卡住，你：', a:'觉得这个规定蠢，忍不住吐槽', b:'想想有没有办法绕过去' },
+  { dim:'DZ', text:'你身边的朋友大概知道你现在过得怎么样吗：', a:'应该知道，我说得比较多', b:'不太知道，我不常说这些' },
+  // 第4轮
+  { dim:'KT', text:'年终绩效季来临，你的状态是：', a:'开始整理自己的亮点，想想怎么展示', b:'反正也没什么亮点，随便吧' },
+  { dim:'XM', text:'独处的时候，你会不会思考"我现在过的是不是我想要的生活"：', a:'会，而且有时候答案让自己不舒服', b:'不会，或者想了也没什么感觉' },
+  { dim:'YR', text:'同龄人比你过得好，你更倾向于认为：', a:'他们有资源有运气，换我我也行', b:'他们可能在某些地方做对了' },
+  { dim:'DZ', text:'在公司吃到难吃的工作餐，你：', a:'会跟同事抱怨两句', b:'默默吃完' },
+  // 第5轮
+  { dim:'KT', text:'看到同龄人分享升职/买房/创业成功的朋友圈，你：', a:'有点焦虑，默默想着自己的规划', b:'点个赞，继续刷下一条' },
+  { dim:'XM', text:'假期结束前一天晚上，你：', a:'有明显的抵触情绪，很不想上班', b:'已经提前进入上班状态，没什么感觉' },
+  { dim:'YR', text:'连续几件事情都不顺，你：', a:'觉得最近运气太差，老天针对我', b:'反思是不是哪个环节出了问题' },
+  { dim:'DZ', text:'对某个决定不满意，你：', a:'会表达异议', b:'忍了，但心里记着' },
+  // 第6轮
+  { dim:'KT', text:'公司组织"自愿"加班团建（不去会被记住），你：', a:'去，还努力表现积极', b:'称病请假' },
+  { dim:'XM', text:'朋友说"你最近看起来很累"，你：', a:'有点被说中的感觉，确实', b:'没感觉到累啊，可能是脸的问题' },
+  { dim:'YR', text:'为什么要加班，你觉得：', a:'工作量本来就太多，任何人来都这样', b:'可能两个因素都有，效率和工作量' },
+  { dim:'DZ', text:'心情不好时朋友问"你还好吗"，你：', a:'老实说不太好，聊一聊', b:'说"还好"，不想麻烦别人' },
+  // 第7轮
+  { dim:'KT', text:'手头有个不紧急但重要的项目，你会：', a:'提前开始，拆解成小任务推进', b:'等到真的紧急再说' },
+  { dim:'XM', text:'做了很久却没有任何结果的事情，你：', a:'会有挫败感或失落', b:'继续做，感觉不到什么' },
+  { dim:'YR', text:'很努力但没得到应有的回报，你：', a:'认为规则不公平，付出不一定有回报', b:'想搞清楚自己努力的方向对不对' },
+  { dim:'DZ', text:'取得了一个小成就，你会：', a:'跟人分享，哪怕是小事', b:'自己知道就行' },
+  // 第8轮
+  { dim:'KT', text:'发现一个升职机会但需要额外投入，你：', a:'认真研究值不值得，然后拼一把', b:'太麻烦了，现在这样也行' },
+  { dim:'XM', text:'刷到"35岁职场危机"相关内容，你：', a:'有触动，会想到自己', b:'划走，跟我没关系' },
+  { dim:'YR', text:'别人对你的评价和你自我认知不一致，你：', a:'觉得对方不了解你', b:'会想想对方说的有没有道理' },
+  { dim:'DZ', text:'对一件事有强烈的看法，你：', a:'会说出来', b:'憋着，或者只在心里想' },
+  // 第9轮
+  { dim:'KT', text:'领导说"你还有很大的成长空间"，你听到的是：', a:'有机会，我要抓住', b:'意思是我现在还不够好呗' },
+  { dim:'XM', text:'发现自己已经很久没有真正"开心"过了，你的反应：', a:'这个发现让我有点不安', b:'正常吧，成年人不都这样' },
+  { dim:'YR', text:'看到社会上的不公平现象，你通常：', a:'愤怒，或者觉得很荒谬', b:'想想在这个规则下怎么让自己更好' },
+  { dim:'DZ', text:'朋友圈/社交媒体上，你：', a:'偶尔会发点状态、感受', b:'基本只看不发，或者发纯信息' },
+  // 第10轮
+  { dim:'KT', text:'周一早上醒来，你：', a:'脑子里已经在规划今天要做什么', b:'希望今天是周五' },
+  { dim:'XM', text:'周末睡到自然醒，你的第一感受是：', a:'这才是生活，好好珍惜', b:'也就那样，起来刷刷手机' },
+  { dim:'YR', text:'人生没有按预期走，你觉得：', a:'有很多外部因素导致了现在这样', b:'很多事情就是这样，接受现实才能往前走' },
+  { dim:'DZ', text:'当你真的很累了，你的第一反应是：', a:'想找人说说话', b:'想一个人待着' },
+];
+
+// ═══ 16种结果 ═══
+const results = {
+  'KXYD': { stage:'觉醒牛马', state:'定时炸弹型', desc:'你清楚地知道自己在被消耗，还在卷，还在说。你是办公室里最危险的那个人——因为你有感觉，有嘴，还有力气。领导开会你能听出哪句话是废话，下班之后你还会跟朋友复盘今天的荒谬。你没崩，但你随时可以崩。' },
+  'KXYZ': { stage:'觉醒牛马', state:'内耗晚期', desc:'你清楚地感受到每一分痛苦，把它们全部压回去，然后继续卷。你的内心是一个满载的核反应堆，外表平静，内部随时临界。你知道这样不对，但开口太麻烦了，所以你选择一个人慢慢烧。' },
+  'KXRD': { stage:'觉醒牛马', state:'诈尸型振作', desc:'你知道现实很难，你接受了，但你还是选择卷。还能对同事挤出笑容说"加油"。这不是乐观，这是高级伪装——你早就看透了，只是决定继续演下去。偶尔你自己也不知道哪个才是真实的你。' },
+  'KXRZ': { stage:'觉醒牛马', state:'已超脱型', desc:'清醒、认命、还在卷、什么都不说。你是最完美的打工人标本：有感觉，不反抗，不抱怨，持续运转。从外面看你是模范员工，只有你自己知道里面装的是一片废墟。令人心疼。' },
+  'KMYD': { stage:'人形牛马', state:'定时炸弹型', desc:'感觉已经麻了，但嘴还没麻。你的身体在自动运转，大脑在持续输出不满。一个行走的矛盾体：不知道自己到底还疼不疼，但就是忍不住说两句。你的存在本身就是一种社会现象。' },
+  'KMYZ': { stage:'人形牛马', state:'内耗晚期', desc:'麻了，卷着，什么都藏着。你已经不太确定自己有没有感觉，但身体还是每天准时打卡。那些没说出口的话积累了太久，偶尔半夜突然清醒，然后继续睡过去。这是最高阶的牛马形态。' },
+  'KMRD': { stage:'人形牛马', state:'诈尸型振作', desc:'麻了，认了，还能笑着说"还好还好"。你不知道自己是真的想开了，还是已经彻底断线。同事问你累不累，你说不累，说完自己都信了。你的振作是一种反射弧，跟情绪已经没什么关系。' },
+  'KMRZ': { stage:'人形牛马', state:'已超脱型', desc:'麻了，认了，不说了，还在卷。你已经超越了"人"的范畴，进化成了一台精密的产出机器。没有抱怨，没有情绪，没有期待。恭喜——你达到了大多数打工人穷尽一生也到不了的境界。' },
+  'TXYD': { stage:'清醒摆烂', state:'定时炸弹型', desc:'你感觉得到，你有意见，你选择躺。这是最有自我意识的摆烂——你知道为什么躺，还会告诉别人为什么。你躺得有理有据，说起来头头是道，是摆烂界的理论家。建议出书。' },
+  'TXYZ': { stage:'清醒摆烂', state:'内耗晚期', desc:'躺着，清醒，有很多话，一句都不说。你是一个思想深刻的观察者，躺在那里静静地消化这个荒诞的世界。你看透的太多，但说出来又有什么用呢？于是你选择沉默，同时继续看透。' },
+  'TXRD': { stage:'清醒摆烂', state:'诈尸型振作', desc:'躺了，想通了，还能对人表现得云淡风轻。你的摆烂有一种令人羡慕的从容感。别人问你为什么看起来这么放松，你说"看开了"，但其实是看透了。两者区别很大，但结果一样好看。' },
+  'TXRZ': { stage:'清醒摆烂', state:'已超脱型', desc:'躺着，清醒，认命，沉默。你已经到达了人类精神的某种边界。外人看你是平静，只有你自己知道里面装的是什么——是彻底理解了这个游戏之后，选择不玩了的那种宁静。' },
+  'TMYD': { stage:'传说级吗喽', state:'定时炸弹型', desc:'麻了，躺了，但嘴还没停。你已经不在乎了，但还是会骂两句。这种状态有一种奇异的自由——既然都不在乎了，骂起来也没什么负担。你是一个麻了的嘴强王者，江湖地位特殊。' },
+  'TMYZ': { stage:'传说级吗喽', state:'内耗晚期', desc:'麻了，躺了，还在内耗。你以为你不在乎了，但那个藏在心里的声音说明你还没彻底解脱。你很接近传说级别，差的那口气叫做"彻底放下"。加油，就差最后一步了。（或者不加油也行。）' },
+  'TMRD': { stage:'传说级吗喽', state:'诈尸型振作', desc:'麻了，躺了，认了，还能笑。恭喜你，你已经达到了普通打工人难以企及的精神境界。你是同事眼中的正能量，领导眼中的稳定军心，朋友眼中的看开了。你是传说，也是谜。' },
+  'TMRZ': { stage:'传说级吗喽', state:'已超脱型', desc:'麻了，躺了，认了，沉默。你已经不属于这个维度了。我们叫不醒你，因为你没有睡着——你只是不想回来了。你达到了NHTI诊断所能测出的最终形态。欢迎来到虚空，这里很安静。' },
+};
+
+// ═══ 状态 ═══
+let current = 0;
+let scores = { KT: { K: 0, T: 0 }, XM: { X: 0, M: 0 }, YR: { Y: 0, R: 0 }, DZ: { D: 0, Z: 0 } };
+const aKeys = { KT: 'K', XM: 'X', YR: 'Y', DZ: 'D' };
+const bKeys = { KT: 'T', XM: 'M', YR: 'R', DZ: 'Z' };
+const dimLabels = { KT: '卷 / 躺', XM: '醒 / 麻', YR: '怨 / 认', DZ: '显 / 藏' };
+
+function startQuiz() {
+  showScreen('screen-quiz');
+  renderQuestion();
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  const pct = Math.round((current / questions.length) * 100);
+
+  document.getElementById('q-counter').textContent = `第 ${current + 1} 题 / 共 ${questions.length} 题`;
+  document.getElementById('q-pct').textContent = pct + '%';
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('dim-tag').textContent = dimLabels[q.dim] + ' 维度';
+  document.getElementById('question-text').textContent = q.text;
+
+  const container = document.getElementById('options-container');
+  container.innerHTML = `
+    <button class="opt-btn" onclick="answer('a')">
+      <span class="opt-label">A</span>
+      <span>${q.a}</span>
+    </button>
+    <button class="opt-btn" onclick="answer('b')">
+      <span class="opt-label">B</span>
+      <span>${q.b}</span>
+    </button>
+  `;
+}
+
+function answer(choice) {
+  const q = questions[current];
+  const key = choice === 'a' ? aKeys[q.dim] : bKeys[q.dim];
+  scores[q.dim][key]++;
+  current++;
+  if (current >= questions.length) {
+    showResult();
+  } else {
+    // brief fade
+    const quiz = document.getElementById('screen-quiz');
+    quiz.style.opacity = '0';
+    quiz.style.transition = 'opacity .15s';
+    setTimeout(() => {
+      renderQuestion();
+      quiz.style.opacity = '1';
+    }, 150);
+  }
+}
+
+function showResult() {
+  // Determine poles
+  const kt = scores.KT.K >= scores.KT.T ? 'K' : 'T';
+  const xm = scores.XM.X >= scores.XM.M ? 'X' : 'M';
+  const yr = scores.YR.Y >= scores.YR.R ? 'Y' : 'R';
+  const dz = scores.DZ.D >= scores.DZ.Z ? 'D' : 'Z';
+  const code = kt + xm + yr + dz;
+  const r = results[code];
+
+  document.getElementById('r-stage').textContent = r.stage;
+  document.getElementById('r-state').textContent = r.state;
+  document.getElementById('r-code').textContent = `[ ${code} ]`;
+  document.getElementById('r-desc').textContent = r.desc;
+
+  // Dim cards
+  const dimData = [
+    { label:'卷 / 躺', result: kt === 'K' ? '卷（K）' : '躺（T）', pct: Math.round(scores.KT[kt] / 10 * 100), score: `${scores.KT.K} 卷 / ${scores.KT.T} 躺` },
+    { label:'醒 / 麻', result: xm === 'X' ? '醒（X）' : '麻（M）', pct: Math.round(scores.XM[xm] / 10 * 100), score: `${scores.XM.X} 醒 / ${scores.XM.M} 麻` },
+    { label:'怨 / 认', result: yr === 'Y' ? '怨（Y）' : '认（R）', pct: Math.round(scores.YR[yr] / 10 * 100), score: `${scores.YR.Y} 怨 / ${scores.YR.R} 认` },
+    { label:'显 / 藏', result: dz === 'D' ? '显（D）' : '藏（Z）', pct: Math.round(scores.DZ[dz] / 10 * 100), score: `${scores.DZ.D} 显 / ${scores.DZ.Z} 藏` },
+  ];
+  document.getElementById('r-dims').innerHTML = dimData.map(d => `
+    <div class="dim-card">
+      <div class="dc-label">${d.label}</div>
+      <div class="dc-result">${d.result}</div>
+      <div class="dc-bar-wrap"><div class="dc-bar" style="width:${d.pct}%"></div></div>
+      <div class="dc-score">${d.score}</div>
+    </div>
+  `).join('');
+
+  // Share text
+  const shareStr = `我做了 NHTI 牛马人格诊断，结果是：\n\n【${r.stage} · ${r.state}】\n\n"${r.desc.slice(0, 60)}……"\n\n你是哪种牛马形态？`;
+  document.getElementById('share-content').textContent = shareStr;
+
+  showScreen('screen-result');
+}
+
+function copyShare() {
+  const text = document.getElementById('share-content').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+  });
+}
+
+function retake() {
+  current = 0;
+  scores = { KT: { K: 0, T: 0 }, XM: { X: 0, M: 0 }, YR: { Y: 0, R: 0 }, DZ: { D: 0, Z: 0 } };
+  showScreen('screen-landing');
+}
+</script>
+</body>
+</html>
