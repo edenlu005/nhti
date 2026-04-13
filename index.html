@@ -6,563 +6,618 @@
   <title>NHTI · 牛马人格诊断</title>
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
     :root {
-      --bg: #0d0d0d;
-      --card: #161616;
-      --card2: #1e1e1e;
-      --border: #2a2a2a;
-      --gold: #c9a84c;
-      --gold-dim: #8a7030;
-      --text: #e2e2e2;
-      --text-dim: #888;
-      --red: #d94f4f;
-      --green: #4fad7c;
+      --bg: #f0ece4; --card: #ffffff; --card2: #f7f3ec; --border: #e0d9ce;
+      --gold: #9a6c0a; --gold-dim: rgba(154,108,10,0.12); --text: #1a140a; --text-dim: #7a6e60;
     }
-
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: var(--bg); color: var(--text); min-height: 100vh;
+      display: flex; align-items: center; justify-content: center; padding: 20px;
     }
-
-    .screen { display: none; width: 100%; max-width: 680px; animation: fadeIn .35s ease; }
+    .screen { display: none; width: 100%; max-width: 700px; animation: fadeIn .3s ease; }
     .screen.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 
-    /* ── LANDING ── */
-    .landing { text-align: center; padding: 60px 20px; }
-    .badge {
-      display: inline-block;
-      background: var(--gold-dim);
-      color: var(--gold);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      padding: 5px 12px;
-      border-radius: 4px;
-      margin-bottom: 28px;
-      text-transform: uppercase;
-    }
-    .landing h1 {
-      font-size: clamp(38px, 8vw, 64px);
-      font-weight: 900;
-      letter-spacing: -1px;
-      line-height: 1;
-      margin-bottom: 10px;
-      color: #fff;
-    }
-    .landing h1 span { color: var(--gold); }
-    .landing .sub {
-      font-size: 14px;
-      color: var(--text-dim);
-      margin-bottom: 40px;
-      line-height: 1.7;
-    }
-    .landing .sub em {
-      color: var(--text);
-      font-style: normal;
-    }
+    .landing { text-align:center; padding:60px 20px; }
+    .badge { display:inline-block; background:var(--gold-dim); color:var(--gold); font-size:11px; font-weight:700; letter-spacing:2px; padding:5px 12px; border-radius:4px; margin-bottom:28px; }
+    .landing h1 { font-size:clamp(40px,9vw,72px); font-weight:900; color:var(--text); margin-bottom:6px; letter-spacing:-2px; }
+    .landing h1 span { color:var(--gold); }
+    .landing .sub { font-size:14px; color:var(--text-dim); margin-bottom:40px; line-height:1.8; }
+    .landing .sub em { color:var(--text); font-style:normal; }
+    .stat-row { display:flex; justify-content:center; gap:36px; margin-bottom:44px; }
+    .stat .num { font-size:26px; font-weight:800; color:var(--gold); }
+    .stat .lbl { font-size:11px; color:var(--text-dim); margin-top:2px; letter-spacing:1px; }
+    .divider { height:1px; background:var(--border); margin:0 auto 44px; max-width:180px; }
+    .btn-start { background:var(--gold); color:#000; border:none; padding:16px 52px; font-size:16px; font-weight:800; border-radius:8px; cursor:pointer; letter-spacing:1px; transition:transform .15s, box-shadow .15s; }
+    .btn-start:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(201,168,76,.3); }
+    .disclaimer { margin-top:24px; font-size:11px; color:var(--text-dim); line-height:1.7; }
 
-    .stat-row {
-      display: flex;
-      justify-content: center;
-      gap: 32px;
-      margin-bottom: 48px;
-    }
-    .stat { text-align: center; }
-    .stat .num { font-size: 24px; font-weight: 800; color: var(--gold); }
-    .stat .label { font-size: 11px; color: var(--text-dim); margin-top: 2px; letter-spacing: 1px; }
+    .quiz-header { margin-bottom:28px; }
+    .progress-meta { display:flex; justify-content:space-between; font-size:12px; color:var(--text-dim); margin-bottom:8px; }
+    .progress-meta .qn { font-weight:700; color:var(--text); }
+    .progress-bar { height:3px; background:var(--border); border-radius:2px; overflow:hidden; }
+    .progress-fill { height:100%; background:var(--gold); border-radius:2px; transition:width .4s cubic-bezier(.4,0,.2,1); }
+    .question-card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:32px; margin-bottom:20px; }
+    .dim-tag { font-size:10px; font-weight:700; letter-spacing:2px; color:var(--gold-dim); text-transform:uppercase; margin-bottom:14px; }
+    .question-text { font-size:17px; font-weight:600; line-height:1.7; color:var(--text); }
+    .scale-wrap { display:flex; flex-direction:column; gap:10px; }
+    .scale-btn { background:var(--card2); border:1px solid var(--border); border-radius:10px; padding:14px 20px; font-size:14px; color:var(--text); cursor:pointer; text-align:left; transition:border-color .15s, background .15s, transform .1s; display:flex; align-items:center; gap:12px; }
+    .scale-btn:hover { border-color:var(--gold); background:#ede8df; transform:translateX(3px); }
+    .scale-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+    .dot-2{background:#4fad7c;}.dot-1{background:#8fcc8f;}.dot-0{background:#666;}.dot-m1{background:#cc8f5a;}.dot-m2{background:#d94f4f;}
 
-    .divider { height: 1px; background: var(--border); margin: 0 auto 48px; max-width: 200px; }
+    .result { padding-bottom:48px; }
+    .result-header { text-align:center; padding:44px 20px 36px; border-bottom:1px solid var(--border); margin-bottom:32px; }
+    .result-badge { display:inline-block; background:rgba(201,168,76,.1); border:1px solid var(--gold-dim); color:var(--gold); font-size:11px; font-weight:700; letter-spacing:2px; padding:4px 14px; border-radius:4px; margin-bottom:20px; }
+    .result-title { font-size:32px; font-weight:900; color:var(--text); margin-bottom:6px; }
+    .result-title .dot { color:var(--gold); margin:0 6px; }
+    .result-code { font-size:13px; color:var(--text-dim); margin-bottom:20px; letter-spacing:3px; }
+    .result-tagline { font-size:15px; color:var(--text-dim); font-style:italic; line-height:1.7; max-width:480px; margin:0 auto; }
 
-    .btn-start {
-      background: var(--gold);
-      color: #000;
-      border: none;
-      padding: 16px 48px;
-      font-size: 16px;
-      font-weight: 800;
-      border-radius: 8px;
-      cursor: pointer;
-      letter-spacing: 1px;
-      transition: transform .15s, box-shadow .15s;
-    }
-    .btn-start:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,168,76,.35); }
-    .btn-start:active { transform: translateY(0); }
+    .dim-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:32px; }
+    .dim-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px 18px; }
+    .dc-lbl { font-size:10px; color:var(--text-dim); letter-spacing:1px; text-transform:uppercase; margin-bottom:6px; }
+    .dc-val { font-size:15px; font-weight:800; color:var(--gold); margin-bottom:6px; }
+    .dc-bar-wrap { height:3px; background:var(--border); border-radius:2px; overflow:hidden; margin-bottom:5px; }
+    .dc-bar { height:100%; background:var(--gold); border-radius:2px; }
+    .dc-score { font-size:11px; color:var(--text-dim); }
 
-    .disclaimer {
-      margin-top: 28px;
-      font-size: 11px;
-      color: var(--text-dim);
-      line-height: 1.6;
-    }
+    .tabs { display:flex; gap:4px; margin-bottom:24px; background:var(--card); padding:5px; border-radius:10px; border:1px solid var(--border); }
+    .tab-btn { flex:1; padding:10px; border:none; background:transparent; color:var(--text-dim); font-size:13px; font-weight:600; cursor:pointer; border-radius:7px; transition:background .15s, color .15s; }
+    .tab-btn.active { background:var(--gold); color:#000; }
+    .tab-content { display:none; }
+    .tab-content.active { display:block; animation:fadeIn .25s ease; }
 
-    /* ── QUIZ ── */
-    .quiz-header { margin-bottom: 32px; }
-    .progress-meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-      font-size: 12px;
-      color: var(--text-dim);
-    }
-    .progress-meta .q-num { font-weight: 700; color: var(--text); }
-    .progress-bar {
-      height: 3px;
-      background: var(--border);
-      border-radius: 2px;
-      overflow: hidden;
-    }
-    .progress-fill {
-      height: 100%;
-      background: var(--gold);
-      border-radius: 2px;
-      transition: width .4s cubic-bezier(.4,0,.2,1);
-    }
+    .section { margin-bottom:24px; }
+    .section-title { font-size:13px; font-weight:700; color:var(--gold); letter-spacing:1px; text-transform:uppercase; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--border); }
+    .section p { font-size:14px; line-height:1.85; color:var(--text); margin-bottom:10px; }
+    .section p:last-child { margin-bottom:0; }
 
-    .question-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 36px 32px;
-      margin-bottom: 20px;
-    }
-    .dim-tag {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      color: var(--gold-dim);
-      text-transform: uppercase;
-      margin-bottom: 16px;
-    }
-    .question-text {
-      font-size: 17px;
-      font-weight: 600;
-      line-height: 1.65;
-      color: #fff;
-    }
+    .advice-card { background:var(--card); border:1px solid var(--border); border-left:3px solid var(--gold); border-radius:10px; padding:18px 20px; margin-bottom:12px; }
+    .ac-role { font-size:11px; color:var(--gold); font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-bottom:8px; }
+    .advice-card p { font-size:14px; line-height:1.8; color:var(--text); }
 
-    .options { display: flex; flex-direction: column; gap: 12px; }
-    .opt-btn {
-      background: var(--card2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px 24px;
-      font-size: 15px;
-      color: var(--text);
-      cursor: pointer;
-      text-align: left;
-      line-height: 1.55;
-      transition: border-color .15s, background .15s, transform .1s;
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-    }
-    .opt-btn:hover { border-color: var(--gold); background: #222; transform: translateX(4px); }
-    .opt-btn .opt-label {
-      min-width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      background: var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text-dim);
-      flex-shrink: 0;
-      margin-top: 1px;
-      transition: background .15s, color .15s;
-    }
-    .opt-btn:hover .opt-label { background: var(--gold); color: #000; }
+    .money-card { background:linear-gradient(135deg,#fdf8ee,#f7f3e8); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:12px; }
+    .mc-title { font-size:13px; font-weight:700; color:var(--gold); margin-bottom:8px; }
+    .money-card p { font-size:14px; line-height:1.8; color:var(--text); }
 
-    /* ── RESULT ── */
-    .result { padding-bottom: 40px; }
-    .result-header {
-      text-align: center;
-      padding: 48px 20px 40px;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 36px;
-    }
-    .result-badge {
-      display: inline-block;
-      background: rgba(201,168,76,.12);
-      border: 1px solid var(--gold-dim);
-      color: var(--gold);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      padding: 5px 14px;
-      border-radius: 4px;
-      margin-bottom: 24px;
-      text-transform: uppercase;
-    }
-    .result-stage {
-      font-size: 34px;
-      font-weight: 900;
-      color: #fff;
-      margin-bottom: 6px;
-    }
-    .result-dot { color: var(--gold); margin: 0 4px; }
-    .result-state {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--text-dim);
-      margin-bottom: 28px;
-    }
-    .result-desc {
-      font-size: 15px;
-      line-height: 1.8;
-      color: var(--text);
-      max-width: 480px;
-      margin: 0 auto;
-      padding: 24px;
-      background: var(--card);
-      border-radius: 12px;
-      border-left: 3px solid var(--gold);
-      text-align: left;
-    }
+    .share-section { text-align:center; margin-top:36px; padding-top:32px; border-top:1px solid var(--border); }
+    .share-box { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:16px 20px; font-size:13px; color:var(--text); line-height:1.7; margin:16px 0; cursor:pointer; text-align:left; transition:border-color .15s; white-space:pre-wrap; }
+    .share-box:hover { border-color:var(--gold); }
+    .copy-hint { font-size:11px; color:var(--text-dim); text-align:center; margin-top:6px; }
+    .btn-retake { background:transparent; border:1px solid var(--border); color:var(--text-dim); padding:12px 32px; border-radius:8px; font-size:14px; cursor:pointer; transition:border-color .15s, color .15s; margin-top:16px; }
+    .btn-retake:hover { border-color:var(--gold); color:var(--gold); }
 
-    .result-dims {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 32px;
-    }
-    .dim-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 18px 20px;
-    }
-    .dim-card .dc-label { font-size: 10px; color: var(--text-dim); letter-spacing: 1px; margin-bottom: 8px; text-transform: uppercase; }
-    .dim-card .dc-result { font-size: 16px; font-weight: 800; color: var(--gold); margin-bottom: 4px; }
-    .dim-card .dc-bar-wrap { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; margin-top: 8px; }
-    .dim-card .dc-bar { height: 100%; background: var(--gold); border-radius: 2px; }
-    .dim-card .dc-score { font-size: 11px; color: var(--text-dim); margin-top: 6px; }
+    .toast { position:fixed; bottom:30px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--gold); color:#fff; padding:10px 24px; border-radius:8px; font-size:13px; font-weight:700; opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
-    .share-section { text-align: center; margin-top: 36px; }
-    .share-text { font-size: 13px; color: var(--text-dim); margin-bottom: 16px; }
-    .share-copy {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 16px 20px;
-      font-size: 14px;
-      color: var(--text);
-      line-height: 1.6;
-      margin-bottom: 20px;
-      text-align: left;
-      cursor: pointer;
-      transition: border-color .15s;
-    }
-    .share-copy:hover { border-color: var(--gold); }
-    .copy-hint { font-size: 11px; color: var(--text-dim); margin-top: 6px; text-align: center; }
+    /* 返回按钮 */
+    .back-row { text-align:center; margin-top:10px; }
+    .btn-back { background:transparent; border:1px solid var(--border); color:var(--text-dim); padding:10px 24px; border-radius:8px; font-size:13px; cursor:pointer; transition:border-color .15s, color .15s; }
+    .btn-back:hover { border-color:var(--gold); color:var(--gold); }
 
-    .btn-retake {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--text-dim);
-      padding: 12px 32px;
-      border-radius: 8px;
-      font-size: 14px;
-      cursor: pointer;
-      transition: border-color .15s, color .15s;
-    }
-    .btn-retake:hover { border-color: var(--gold); color: var(--gold); }
+    /* 截图 / 保存 */
+    .btn-save { background:var(--gold); color:#fff; border:none; padding:12px 28px; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; transition:transform .15s, box-shadow .15s; }
+    .btn-save:hover { transform:translateY(-1px); box-shadow:0 6px 18px rgba(154,108,10,.25); }
+    .result-actions { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:20px; }
 
-    .copied-toast {
-      position: fixed;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: var(--gold);
-      color: #000;
-      padding: 10px 24px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 700;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .25s, transform .25s;
-    }
-    .copied-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    /* 上次结果 banner */
+    .prev-banner { background:var(--card); border:1px solid var(--border); border-left:3px solid var(--gold); border-radius:10px; padding:14px 18px; margin-bottom:28px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .prev-banner .pb-label { font-size:11px; color:var(--text-dim); letter-spacing:1px; text-transform:uppercase; margin-bottom:3px; }
+    .prev-banner .pb-code { font-size:16px; font-weight:800; color:var(--gold); }
+    .btn-view-prev { background:transparent; border:1px solid var(--gold); color:var(--gold); padding:8px 16px; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; flex-shrink:0; }
+    .btn-view-prev:hover { background:var(--gold); color:#fff; }
 
-    @media (max-width: 480px) {
-      .question-card { padding: 24px 20px; }
-      .result-dims { grid-template-columns: 1fr; }
-      .stat-row { gap: 20px; }
-    }
+    /* 截图专用卡片 */
+    #snapshot-card { background:var(--card); border-radius:16px; padding:32px; text-align:center; display:none; }
+
+    @media(max-width:480px){.question-card{padding:22px 16px;}.dim-grid{grid-template-columns:1fr;}.stat-row{gap:20px;}.tabs{flex-direction:column;}.result-actions{flex-direction:column;align-items:center;}}
   </style>
 </head>
 <body>
 
-<!-- ═══════════════ LANDING ═══════════════ -->
 <div id="screen-landing" class="screen active">
   <div class="landing">
-    <div class="badge">2026 · 牛马人格研究所</div>
+    <div id="prev-banner" style="display:none" class="prev-banner">
+      <div>
+        <div class="pb-label">你上次的诊断结果</div>
+        <div class="pb-code" id="pb-code">——</div>
+      </div>
+      <button class="btn-view-prev" onclick="viewPrevResult()">查看结果 →</button>
+    </div>
+    <div class="badge">2026 · 牛马人格研究所出品</div>
     <h1>N<span>H</span>TI</h1>
-    <p style="font-size:18px; font-weight:700; color:#aaa; margin-bottom:12px; letter-spacing:2px;">牛马人格诊断</p>
+    <p style="font-size:16px;font-weight:700;color:#777;margin-bottom:20px;letter-spacing:4px;">牛马人格诊断</p>
+
     <p class="sub">
-      比 MBTI 更懂你，<em>因为它只测你还剩多少。</em><br>
-      4 个维度 · 40 道题 · 16 种牛马形态
+      MBTI 测你是什么人，<em>NHTI 测你还剩多少。</em><br><br>
+      你是<em>觉醒牛马</em>还是<em>传说级吗喽</em>？<br>
+      你在<em>间歇性崩溃</em>还是已经<em>彻底超脱</em>？<br><br>
+      4 个维度，40 道题，16 种结果<br>
+      含<em>职场协作指南</em>和<em>专属赚钱建议</em>
     </p>
 
     <div class="stat-row">
-      <div class="stat"><div class="num">40</div><div class="label">道测试题</div></div>
-      <div class="stat"><div class="num">16</div><div class="label">种诊断结果</div></div>
-      <div class="stat"><div class="num">~5</div><div class="label">分钟完成</div></div>
+      <div class="stat"><div class="num">40</div><div class="lbl">道测试题</div></div>
+      <div class="stat"><div class="num">16</div><div class="lbl">种牛马形态</div></div>
+      <div class="stat"><div class="num">~5分</div><div class="lbl">钟完成</div></div>
     </div>
 
     <div class="divider"></div>
 
-    <button class="btn-start" onclick="startQuiz()">开始诊断</button>
+    <button class="btn-start" onclick="startQuiz()">开始诊断，测测你还剩多少</button>
 
-    <p class="disclaimer">
-      本测试纯属娱乐整活，结果不构成任何医学或职业建议。<br>
-      如测出结果后感到共鸣，属于正常社会现象。
+    <p style="margin-top:16px;font-size:13px;color:var(--text-dim);line-height:1.8;">
+      ——曾经有人做完之后沉默了三分钟。<br>
+      <span style="color:#555;font-size:11px;">本测试纯属娱乐。如结果过度共鸣，属于正常社会现象。</span>
     </p>
   </div>
 </div>
 
-<!-- ═══════════════ QUIZ ═══════════════ -->
 <div id="screen-quiz" class="screen">
   <div class="quiz-header">
     <div class="progress-meta">
-      <span class="q-num" id="q-counter">第 1 题 / 共 40 题</span>
+      <span class="qn" id="q-counter">第 1 题 / 共 40 题</span>
       <span id="q-pct">0%</span>
     </div>
     <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
   </div>
-
   <div class="question-card">
     <div class="dim-tag" id="dim-tag">维度评估</div>
-    <div class="question-text" id="question-text">题目加载中...</div>
+    <div class="question-text" id="question-text">加载中...</div>
   </div>
-
-  <div class="options" id="options-container"></div>
+  <div class="scale-wrap" id="scale-wrap"></div>
+  <div class="back-row">
+    <button class="btn-back" id="btn-back" onclick="goBack()" style="display:none">← 上一题，修改答案</button>
+  </div>
 </div>
 
-<!-- ═══════════════ RESULT ═══════════════ -->
 <div id="screen-result" class="screen">
   <div class="result">
     <div class="result-header">
       <div class="result-badge">NHTI 诊断报告</div>
-      <div class="result-stage">
-        <span id="r-stage"></span><span class="result-dot">·</span><span id="r-state"></span>
-      </div>
-      <div class="result-state" id="r-code"></div>
-      <div class="result-desc" id="r-desc"></div>
+      <div class="result-title"><span id="r-stage"></span><span class="dot">·</span><span id="r-state"></span></div>
+      <div class="result-code" id="r-code"></div>
+      <div class="result-tagline" id="r-tagline"></div>
     </div>
-
-    <div class="result-dims" id="r-dims"></div>
-
+    <div class="dim-grid" id="r-dims"></div>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab(0)">人格解析</button>
+      <button class="tab-btn" onclick="switchTab(1)">职场协作</button>
+      <button class="tab-btn" onclick="switchTab(2)">赚钱建议</button>
+    </div>
+    <div id="tab-0" class="tab-content active">
+      <div class="section"><div class="section-title">核心人格</div><div id="r-analysis"></div></div>
+      <div class="section"><div class="section-title">你的优势</div><div id="r-strengths"></div></div>
+      <div class="section"><div class="section-title">你的局限</div><div id="r-limits"></div></div>
+    </div>
+    <div id="tab-1" class="tab-content">
+      <div class="advice-card"><div class="ac-role">与上司相处</div><div id="r-boss"></div></div>
+      <div class="advice-card"><div class="ac-role">与同事相处</div><div id="r-peers"></div></div>
+      <div class="advice-card"><div class="ac-role">与下属相处</div><div id="r-reports"></div></div>
+    </div>
+    <div id="tab-2" class="tab-content">
+      <div class="money-card"><div class="mc-title">核心变现方向</div><div id="r-money-core"></div></div>
+      <div class="money-card"><div class="mc-title">副业建议</div><div id="r-money-side"></div></div>
+      <div class="money-card"><div class="mc-title">长期财富策略</div><div id="r-money-long"></div></div>
+    </div>
     <div class="share-section">
-      <p class="share-text">复制以下内容分享给朋友，让他们也来测一测 👇</p>
-      <div class="share-copy" id="share-text-box" onclick="copyShare()">
-        <span id="share-content"></span>
-        <p class="copy-hint">点击复制</p>
+      <p style="font-size:13px;color:var(--text-dim);">复制分享给朋友，让他们也来测一测</p>
+      <div class="share-box" id="share-box" onclick="copyShare()"></div>
+      <p class="copy-hint">点击复制</p>
+      <div class="result-actions">
+        <button class="btn-save" onclick="saveAsImage()">📷 截图保存结果</button>
+        <button class="btn-retake" onclick="retake()">重新测一次</button>
       </div>
-      <br>
-      <button class="btn-retake" onclick="retake()">再测一次</button>
     </div>
   </div>
 </div>
 
-<div class="copied-toast" id="toast">已复制到剪贴板 ✓</div>
-
+<div class="toast" id="toast">已复制 ✓</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
-// ═══ 题库（按维度交错排列：KT → XM → YR → DZ 循环）═══
-const questions = [
-  // 第1轮
-  { dim:'KT', text:'周五下午5点，老板发来消息"这个周末能把方案赶出来吗？"，你第一反应是：', a:'已经在想从哪里开始了', b:'手机屏幕暗了，我也跟着暗了' },
-  { dim:'XM', text:'加班到很晚终于回到家，你的感受是：', a:'有点委屈或愤怒，这不正常', b:'正常，反正都这样' },
-  { dim:'YR', text:'项目失败了，首先浮现在脑海里的念头是：', a:'这事本来就不该这么安排', b:'下次得换个方法' },
-  { dim:'DZ', text:'工作压力特别大的时候，你会：', a:'跟朋友/家人倾诉，或者发朋友圈', b:'自己消化，不太说出口' },
-  // 第2轮
-  { dim:'KT', text:'同事说他昨天加班到12点，你：', a:'不自觉地开始回忆自己上次几点走的', b:'心想这有什么好说的' },
-  { dim:'XM', text:'连续高压工作一个月后，你：', a:'明显感觉到疲惫，需要休息', b:'没什么特别感觉，继续' },
-  { dim:'YR', text:'工资涨幅跑不过通货膨胀，你：', a:'觉得这个社会/公司/经济有问题', b:'看看哪里能省钱或者多赚点' },
-  { dim:'DZ', text:'被人误解了，你：', a:'想解释清楚', b:'算了，解释也麻烦' },
-  // 第3轮
-  { dim:'KT', text:'你制定了"每天6点起床健身"的计划，第三天闹钟响了：', a:'挣扎一下，最终爬起来', b:'已经把闹钟改成8点了' },
-  { dim:'XM', text:'被领导当众批评，你当时：', a:'有明显情绪波动（尴尬/愤怒/难受）', b:'面部表情基本没变化' },
-  { dim:'YR', text:'被不合理的规定卡住，你：', a:'觉得这个规定蠢，忍不住吐槽', b:'想想有没有办法绕过去' },
-  { dim:'DZ', text:'你身边的朋友大概知道你现在过得怎么样吗：', a:'应该知道，我说得比较多', b:'不太知道，我不常说这些' },
-  // 第4轮
-  { dim:'KT', text:'年终绩效季来临，你的状态是：', a:'开始整理自己的亮点，想想怎么展示', b:'反正也没什么亮点，随便吧' },
-  { dim:'XM', text:'独处的时候，你会不会思考"我现在过的是不是我想要的生活"：', a:'会，而且有时候答案让自己不舒服', b:'不会，或者想了也没什么感觉' },
-  { dim:'YR', text:'同龄人比你过得好，你更倾向于认为：', a:'他们有资源有运气，换我我也行', b:'他们可能在某些地方做对了' },
-  { dim:'DZ', text:'在公司吃到难吃的工作餐，你：', a:'会跟同事抱怨两句', b:'默默吃完' },
-  // 第5轮
-  { dim:'KT', text:'看到同龄人分享升职/买房/创业成功的朋友圈，你：', a:'有点焦虑，默默想着自己的规划', b:'点个赞，继续刷下一条' },
-  { dim:'XM', text:'假期结束前一天晚上，你：', a:'有明显的抵触情绪，很不想上班', b:'已经提前进入上班状态，没什么感觉' },
-  { dim:'YR', text:'连续几件事情都不顺，你：', a:'觉得最近运气太差，老天针对我', b:'反思是不是哪个环节出了问题' },
-  { dim:'DZ', text:'对某个决定不满意，你：', a:'会表达异议', b:'忍了，但心里记着' },
-  // 第6轮
-  { dim:'KT', text:'公司组织"自愿"加班团建（不去会被记住），你：', a:'去，还努力表现积极', b:'称病请假' },
-  { dim:'XM', text:'朋友说"你最近看起来很累"，你：', a:'有点被说中的感觉，确实', b:'没感觉到累啊，可能是脸的问题' },
-  { dim:'YR', text:'为什么要加班，你觉得：', a:'工作量本来就太多，任何人来都这样', b:'可能两个因素都有，效率和工作量' },
-  { dim:'DZ', text:'心情不好时朋友问"你还好吗"，你：', a:'老实说不太好，聊一聊', b:'说"还好"，不想麻烦别人' },
-  // 第7轮
-  { dim:'KT', text:'手头有个不紧急但重要的项目，你会：', a:'提前开始，拆解成小任务推进', b:'等到真的紧急再说' },
-  { dim:'XM', text:'做了很久却没有任何结果的事情，你：', a:'会有挫败感或失落', b:'继续做，感觉不到什么' },
-  { dim:'YR', text:'很努力但没得到应有的回报，你：', a:'认为规则不公平，付出不一定有回报', b:'想搞清楚自己努力的方向对不对' },
-  { dim:'DZ', text:'取得了一个小成就，你会：', a:'跟人分享，哪怕是小事', b:'自己知道就行' },
-  // 第8轮
-  { dim:'KT', text:'发现一个升职机会但需要额外投入，你：', a:'认真研究值不值得，然后拼一把', b:'太麻烦了，现在这样也行' },
-  { dim:'XM', text:'刷到"35岁职场危机"相关内容，你：', a:'有触动，会想到自己', b:'划走，跟我没关系' },
-  { dim:'YR', text:'别人对你的评价和你自我认知不一致，你：', a:'觉得对方不了解你', b:'会想想对方说的有没有道理' },
-  { dim:'DZ', text:'对一件事有强烈的看法，你：', a:'会说出来', b:'憋着，或者只在心里想' },
-  // 第9轮
-  { dim:'KT', text:'领导说"你还有很大的成长空间"，你听到的是：', a:'有机会，我要抓住', b:'意思是我现在还不够好呗' },
-  { dim:'XM', text:'发现自己已经很久没有真正"开心"过了，你的反应：', a:'这个发现让我有点不安', b:'正常吧，成年人不都这样' },
-  { dim:'YR', text:'看到社会上的不公平现象，你通常：', a:'愤怒，或者觉得很荒谬', b:'想想在这个规则下怎么让自己更好' },
-  { dim:'DZ', text:'朋友圈/社交媒体上，你：', a:'偶尔会发点状态、感受', b:'基本只看不发，或者发纯信息' },
-  // 第10轮
-  { dim:'KT', text:'周一早上醒来，你：', a:'脑子里已经在规划今天要做什么', b:'希望今天是周五' },
-  { dim:'XM', text:'周末睡到自然醒，你的第一感受是：', a:'这才是生活，好好珍惜', b:'也就那样，起来刷刷手机' },
-  { dim:'YR', text:'人生没有按预期走，你觉得：', a:'有很多外部因素导致了现在这样', b:'很多事情就是这样，接受现实才能往前走' },
-  { dim:'DZ', text:'当你真的很累了，你的第一反应是：', a:'想找人说说话', b:'想一个人待着' },
+const questions=[
+  {dim:'KT',text:'周五5点收到老板消息"这个周末能把方案赶出来吗？"，我的第一反应是已经在盘算从哪里开始了。'},
+  {dim:'XM',text:'加班到很晚回到家，我能明显感到委屈或愤怒，觉得这不应该是常态。'},
+  {dim:'YR',text:'项目失败的时候，我首先会想到是外部因素或团队安排的问题。'},
+  {dim:'DZ',text:'压力特别大的时候，我会主动找朋友倾诉或者发朋友圈表达状态。'},
+  {dim:'KT',text:'同事说昨晚加班到12点，我会不由自主地回想自己上次几点走的。'},
+  {dim:'XM',text:'连续高压工作一个月后，我能清楚感受到自己身体和情绪上的疲惫。'},
+  {dim:'YR',text:'遇到不合理的公司规定，我的第一反应是觉得这个规定有问题，而不是想怎么绕过去。'},
+  {dim:'DZ',text:'被人误解了，我会想要解释清楚，而不是选择算了。'},
+  {dim:'KT',text:'我给自己制定的计划（比如早起健身），即使很难也会尽力坚持执行。'},
+  {dim:'XM',text:'被领导当众批评，我当场会有明显的情绪波动（尴尬/愤怒/难受）。'},
+  {dim:'YR',text:'同龄人过得比我好，我更倾向于认为是他们有资源或运气，而不是他们做对了什么。'},
+  {dim:'DZ',text:'我身边的朋友大概都知道我最近过得怎么样，因为我比较愿意说。'},
+  {dim:'KT',text:'年终绩效季来临，我会主动整理自己的工作亮点，认真准备如何展示。'},
+  {dim:'XM',text:'独处时，我会思考"我现在过的是不是自己想要的生活"，而且答案有时让我不舒服。'},
+  {dim:'YR',text:'连续几件事不顺，我倾向于觉得是最近运气差，而非是自己哪里出了问题。'},
+  {dim:'DZ',text:'对公司某个决定不满意，我会表达异议，而不是默默忍下来。'},
+  {dim:'KT',text:'即使公司组织"自愿"加班团建，我也会去，并且努力表现积极。'},
+  {dim:'XM',text:'假期结束前一天晚上，我会有明显的抵触情绪，很不想回去上班。'},
+  {dim:'YR',text:'我觉得自己加班主要是因为工作量本来就太多，而不是自己效率的问题。'},
+  {dim:'DZ',text:'心情不好时朋友问"你还好吗"，我会老实说不太好，而不是说"还行"。'},
+  {dim:'KT',text:'看到同龄人升职/买房/创业成功的朋友圈，我会感到焦虑，并默默想自己的规划。'},
+  {dim:'XM',text:'朋友说我"最近看起来很累"，我能感受到自己确实是累的。'},
+  {dim:'YR',text:'我努力了但没得到相应回报，我倾向于认为是规则不公平，而非方向有问题。'},
+  {dim:'DZ',text:'取得了一个小成就，我会找人分享，哪怕是很小的事。'},
+  {dim:'KT',text:'手头有不紧急但重要的项目，我会提前开始，而不是等到紧急了再动。'},
+  {dim:'XM',text:'做了很久没有结果的事，我会感到明显的挫败感或失落。'},
+  {dim:'YR',text:'别人对我的评价和我自我认知不符，我的第一反应是觉得对方不够了解我。'},
+  {dim:'DZ',text:'对一件事有强烈看法时，我会直接说出来，而不是憋着。'},
+  {dim:'KT',text:'发现一个可能升职的机会，即使需要额外付出，我也会认真考虑并争取。'},
+  {dim:'XM',text:'刷到"35岁职场危机"的内容，我会有触动，会联想到自己的处境。'},
+  {dim:'YR',text:'看到社会不公平现象，我倾向于愤怒和吐槽，而非去想在这个规则下怎么让自己更好。'},
+  {dim:'DZ',text:'我的朋友圈或社交账号偶尔会发一些个人状态或感受。'},
+  {dim:'KT',text:'领导说"你还有很大成长空间"，我听到的是机会，而不是"你现在还不够好"。'},
+  {dim:'XM',text:'发现自己已经很久没有真正开心过了，这个发现让我感到不安。'},
+  {dim:'YR',text:'人生没按预期走，我认为很大程度上是外部环境或他人造成的。'},
+  {dim:'DZ',text:'当我真的很累了，第一反应是想找人说说话。'},
+  {dim:'KT',text:'周一早上醒来，我脑子里会自然开始规划今天要完成的事。'},
+  {dim:'XM',text:'周末睡到自然醒，我会有"这才是生活"的珍惜感。'},
+  {dim:'YR',text:'工资涨幅跑不过通胀，我更多感受到的是对制度和环境的不满。'},
+  {dim:'DZ',text:'真的很累很崩溃时，我宁愿找人倾诉，也不愿意一个人扛着。'},
 ];
 
-// ═══ 16种结果 ═══
-const results = {
-  'KXYD': { stage:'觉醒牛马', state:'定时炸弹型', desc:'你清楚地知道自己在被消耗，还在卷，还在说。你是办公室里最危险的那个人——因为你有感觉，有嘴，还有力气。领导开会你能听出哪句话是废话，下班之后你还会跟朋友复盘今天的荒谬。你没崩，但你随时可以崩。' },
-  'KXYZ': { stage:'觉醒牛马', state:'内耗晚期', desc:'你清楚地感受到每一分痛苦，把它们全部压回去，然后继续卷。你的内心是一个满载的核反应堆，外表平静，内部随时临界。你知道这样不对，但开口太麻烦了，所以你选择一个人慢慢烧。' },
-  'KXRD': { stage:'觉醒牛马', state:'诈尸型振作', desc:'你知道现实很难，你接受了，但你还是选择卷。还能对同事挤出笑容说"加油"。这不是乐观，这是高级伪装——你早就看透了，只是决定继续演下去。偶尔你自己也不知道哪个才是真实的你。' },
-  'KXRZ': { stage:'觉醒牛马', state:'已超脱型', desc:'清醒、认命、还在卷、什么都不说。你是最完美的打工人标本：有感觉，不反抗，不抱怨，持续运转。从外面看你是模范员工，只有你自己知道里面装的是一片废墟。令人心疼。' },
-  'KMYD': { stage:'人形牛马', state:'定时炸弹型', desc:'感觉已经麻了，但嘴还没麻。你的身体在自动运转，大脑在持续输出不满。一个行走的矛盾体：不知道自己到底还疼不疼，但就是忍不住说两句。你的存在本身就是一种社会现象。' },
-  'KMYZ': { stage:'人形牛马', state:'内耗晚期', desc:'麻了，卷着，什么都藏着。你已经不太确定自己有没有感觉，但身体还是每天准时打卡。那些没说出口的话积累了太久，偶尔半夜突然清醒，然后继续睡过去。这是最高阶的牛马形态。' },
-  'KMRD': { stage:'人形牛马', state:'诈尸型振作', desc:'麻了，认了，还能笑着说"还好还好"。你不知道自己是真的想开了，还是已经彻底断线。同事问你累不累，你说不累，说完自己都信了。你的振作是一种反射弧，跟情绪已经没什么关系。' },
-  'KMRZ': { stage:'人形牛马', state:'已超脱型', desc:'麻了，认了，不说了，还在卷。你已经超越了"人"的范畴，进化成了一台精密的产出机器。没有抱怨，没有情绪，没有期待。恭喜——你达到了大多数打工人穷尽一生也到不了的境界。' },
-  'TXYD': { stage:'清醒摆烂', state:'定时炸弹型', desc:'你感觉得到，你有意见，你选择躺。这是最有自我意识的摆烂——你知道为什么躺，还会告诉别人为什么。你躺得有理有据，说起来头头是道，是摆烂界的理论家。建议出书。' },
-  'TXYZ': { stage:'清醒摆烂', state:'内耗晚期', desc:'躺着，清醒，有很多话，一句都不说。你是一个思想深刻的观察者，躺在那里静静地消化这个荒诞的世界。你看透的太多，但说出来又有什么用呢？于是你选择沉默，同时继续看透。' },
-  'TXRD': { stage:'清醒摆烂', state:'诈尸型振作', desc:'躺了，想通了，还能对人表现得云淡风轻。你的摆烂有一种令人羡慕的从容感。别人问你为什么看起来这么放松，你说"看开了"，但其实是看透了。两者区别很大，但结果一样好看。' },
-  'TXRZ': { stage:'清醒摆烂', state:'已超脱型', desc:'躺着，清醒，认命，沉默。你已经到达了人类精神的某种边界。外人看你是平静，只有你自己知道里面装的是什么——是彻底理解了这个游戏之后，选择不玩了的那种宁静。' },
-  'TMYD': { stage:'传说级吗喽', state:'定时炸弹型', desc:'麻了，躺了，但嘴还没停。你已经不在乎了，但还是会骂两句。这种状态有一种奇异的自由——既然都不在乎了，骂起来也没什么负担。你是一个麻了的嘴强王者，江湖地位特殊。' },
-  'TMYZ': { stage:'传说级吗喽', state:'内耗晚期', desc:'麻了，躺了，还在内耗。你以为你不在乎了，但那个藏在心里的声音说明你还没彻底解脱。你很接近传说级别，差的那口气叫做"彻底放下"。加油，就差最后一步了。（或者不加油也行。）' },
-  'TMRD': { stage:'传说级吗喽', state:'诈尸型振作', desc:'麻了，躺了，认了，还能笑。恭喜你，你已经达到了普通打工人难以企及的精神境界。你是同事眼中的正能量，领导眼中的稳定军心，朋友眼中的看开了。你是传说，也是谜。' },
-  'TMRZ': { stage:'传说级吗喽', state:'已超脱型', desc:'麻了，躺了，认了，沉默。你已经不属于这个维度了。我们叫不醒你，因为你没有睡着——你只是不想回来了。你达到了NHTI诊断所能测出的最终形态。欢迎来到虚空，这里很安静。' },
+const SCALE=[
+  {label:'非常符合',score:2,cls:'dot-2'},
+  {label:'比较符合',score:1,cls:'dot-1'},
+  {label:'说不准',score:0,cls:'dot-0'},
+  {label:'比较不符合',score:-1,cls:'dot-m1'},
+  {label:'完全不符合',score:-2,cls:'dot-m2'},
+];
+
+const dimLabels={KT:'卷 / 躺',XM:'醒 / 麻',YR:'怨 / 认',DZ:'显 / 藏'};
+
+const R={
+  KXYD:{stage:'觉醒牛马',state:'定时炸弹型',tagline:'你清楚地感受着每一分消耗，还在卷，还有话说。职场里最危险的清醒者。',
+    analysis:'<p>你是职场中最矛盾也最危险的存在。感知力极强，能清楚辨别哪个会议在浪费时间、哪个KPI是凑数、哪个领导的饼有没有兑现的可能。你没有失去感受力，没有选择麻木。与此同时你还在卷，因为你知道停下来的代价，也因为某种还没熄灭的野心或责任心。清醒与行动并存，让你拥有极强的执行力和锐利判断力。</p><p>但这种组合的代价是内部压力远超常人。你感受得到，放不下，还要继续动。情绪的出口是说出来——有时对朋友，有时在饭桌，有时在不那么合适的场合。这不是弱点，是一种能量没找到最优出口的表现。</p>',
+    strengths:'<p>执行力强，能在高压下持续输出；感知精准，能快速识别问题；表达直接，不轻易被PUA，有真实底线；在团队里往往是推动真正改变的那个人。</p>',
+    limits:'<p>情绪管理是最大挑战，容易在错误时机说了正确的话；高度不满如果没有出口会形成慢性消耗；容易被贴上"难搞"标签，即使你说的是实话。</p>',
+    boss:'<p>你最需要一个能接受真实反馈的上司。如果遇到这样的人，你是他最有价值的信息源之一。如果上司喜欢阿谀，关系会迅速恶化。建议把不满转化为建议语言——"我觉得这样不行"改成"我有个想法，能否试试这个方向"。一对一表达，而非在会议室当众输出。选择合适时机，一次说一个问题，不要累积爆发。</p>',
+    peers:'<p>你是同事里的"清醒清流"，私下都爱找你聊，因为你敢说真话。但注意：直接表达有时让同事感到压力或站队压力。建议建立"核心吐槽圈"，对内坦诚，对外保持职业滤镜。在公开场合让人觉得你是解决问题的人，而不是制造焦虑的人。</p>',
+    reports:'<p>你会是让下属既怕又敬的Leader。你对工作质量有真实感知，不接受敷衍，但也愿意为下属发声。关键是：明确告诉下属你的高标准是针对工作的，不是针对人的。给犯错的空间，但给清晰的边界。</p>',
+    moneyCore:'<p>你的核心优势是感知力与表达力的组合，在市场上价值极高。最适合：咨询顾问（你能快速看到问题所在）、销售（你能读懂客户在想什么）、产品经理（你对"哪里不对劲"的直觉超强）。这些岗位都是感知力直接变现的路径。</p>',
+    moneySide:'<p>职场吐槽类内容创作是你最天然的副业。你说得出别人说不出的话，而且够真实够锐利。小红书、B站、公众号都有这类内容的市场。另外，付费咨询和职场辅导也适合你——很多人愿意为"有人帮我看清楚处境"付费。</p>',
+    moneyLong:'<p>你最大的风险是把才华消耗在错误的环境里。长期财富积累的前提是找到一个值得你卷的地方。建议定期评估：当前这份投入是在积累可转移的能力和资源，还是在原地消耗？如果是后者，要有计划地切换赛道，而不是继续硬撑。</p>'},
+
+  KXYZ:{stage:'觉醒牛马',state:'内耗晚期',tagline:'清楚地感受着每一分痛苦，全部压回去，然后继续卷。你是一个满载的核反应堆。',
+    analysis:'<p>你比大多数人都清醒。你知道哪里不对，知道自己在被消耗，知道这不是你想要的生活——然后你把这些都压下去，继续打卡、继续开会、继续产出。从外面看，你是稳定可靠的那个人。从里面看，你是一个持续内部燃烧的系统。</p><p>内耗之所以比外显更危险，是因为它是隐形的。没有人知道你有多累，包括你自己——因为你太擅长压制感受了。这套策略短期有效，长期会以身体或情绪的某种形式强制"结账"：失眠、躯体化症状、某天突然的崩溃，或者某个早上起床发现什么都不在乎了。</p>',
+    strengths:'<p>极强的自我管控能力，在压力下依然高产；善于独立处理问题，不依赖他人情绪支持；在外部评价体系里往往表现优秀；有深度，能看到别人看不到的层面。</p>',
+    limits:'<p>情绪出口严重不足，长期累积会导致系统性崩溃；别人无法感知你的真实状态，无法给你适时支持；自我批评倾向严重，把外部问题归因于自身；容易被过度使用，因为你"看起来没问题"。</p>',
+    boss:'<p>你对上司高度顺从，即使不同意也很少表态——这让你短期看起来是"好用的人"，但长期会让上司形成错误认知，以为你永远没问题，然后持续加码。建议学会用一句话表达压力信号，比如"我现在手头任务已经比较饱和了，这个新需求需要排一下优先级"。不需要情绪化，只需要让对方知道你有边界。</p>',
+    peers:'<p>同事眼中你是靠谱、沉稳、不抱怨的人，但这也意味着你可能承接了很多不属于你的工作。你很难开口拒绝，因为那感觉像是暴露脆弱。建议找一到两个可以真实说话的同事，建立真实的信息互通，而不是维持"我很好"的表面。</p>',
+    reports:'<p>你对下属有耐心，不喜欢制造冲突，但你也不太会直接说"你这里做得不好"。下属可能摸不清你的真实反馈，以为你满意但实际上你只是没说。建议建立定期的一对一反馈机制，让下属知道你的真实评价，这对他们的成长更负责任。</p>',
+    moneyCore:'<p>你适合需要深度独立工作的领域：研究分析、写作、策划、数据类工作。你的内部思维深度是真实的竞争力，问题是你很少把它展示出来。建议刻意练习"输出"——把脑子里想清楚的东西写出来、说出来，这本身就是变现能力的训练。</p>',
+    moneySide:'<p>你最适合的副业是需要深度思考但不需要大量社交的类型：深度内容写作、知识付费课程、数据分析接单、独立研究报告。你的洞察力在这些领域可以直接转化为产品，而且可以在你自己控制的节奏下进行。</p>',
+    moneyLong:'<p>长期财富积累上，最需要注意"沉默成本陷阱"——因为不想面对离开的不适，在一个不值得的地方耗了太久。定期强迫自己做一次真实的评估：这份工作/这条路，在帮我积累什么？如果答案越来越模糊，那就是信号。你有能力，缺的只是一个敢于重新选择的时刻。</p>'},
+
+  KXRD:{stage:'觉醒牛马',state:'诈尸型振作',tagline:'你看透了，接受了，但还是在卷。逢人还能挤出笑容。这不是乐观，这是高级伪装。',
+    analysis:'<p>你完成了某种难得的认知跨越：既清楚地看到了现实的荒诞，也接受了这个现实，并且选择了继续行动。很多人只能做到其中一两步——要么清醒但愤怒，要么认命但麻木。你同时做到了清醒、认命、继续干，还能对人表现出还行的状态。</p><p>这听起来很强大，实际上也确实是。但代价是你一个人承担了太多认知层面的成本。你比周围人看得清楚，比他们想得明白，但你没有因此变得轻松——只是变得更能撑。这是一种消耗型的成熟。你的"振作"是真实的，但更多来自理性选择而非情绪动力，这意味着你的能量有上限，需要有意识地补充。</p>',
+    strengths:'<p>理性与行动力的结合；能在复杂环境下保持稳定输出；不容易被情绪左右，职场韧性强；对他人表现宽容，因为你已经"想通了"很多事情。</p>',
+    limits:'<p>情绪能量消耗在"维持表面"上，真实状态很少被看见；容易陷入"反正如此"的低期待模式，丧失突破动力；长期的表演性振作可能让自己也搞不清哪个是真实状态。</p>',
+    boss:'<p>你和大多数上司相处得还不错，因为你不抱怨、能产出、还会在适合的时机表现积极。但要小心一个陷阱：你对上司的期待已经很低，所以不会主动争取自己应得的资源或机会。建议每季度主动和上司做一次对齐，说清楚你的目标和期待，而不是默默干活等对方发现。</p>',
+    peers:'<p>你是团队里的稳定剂，大家压力大的时候会来找你，因为你既能聊、又不会放大焦虑。但注意不要成为情绪垃圾桶而忽略自己的需求。和同事建立真实关系，而不仅仅是"没问题的那个人"的角色。</p>',
+    reports:'<p>你是一个成熟的管理者雏形。你对下属宽容，不苛求完美，能给空间。但你需要注意：你的"认命式接受"有时会传染，让下属也觉得"差不多就行了"。在重要的事情上，要明确表达你的标准和期待，而不是什么都"还好还好"。</p>',
+    moneyCore:'<p>你的核心竞争力是稳定性和执行力。市场上需要大量能持续产出、不制造麻烦、又有判断力的人。你适合能够带来持续收入的方向：项目制工作、长期合同型顾问、技术型岗位。稳定是你的护城河，用好它。</p>',
+    moneySide:'<p>你适合启动副业，因为你有执行力，也有足够的"认命感"来面对副业初期的不确定性。方向上，优先选择能复用主业技能的：主业做运营可以接个人品牌顾问，主业做设计可以接私单。用你已有的能力，降低学习成本。</p>',
+    moneyLong:'<p>你的长期财富积累关键词是"复利"——做一件事，让它的价值随时间叠加。你有执行力，缺的是选准一个方向然后持续深耕的决心。建议在主业之外，选一个5年内想成为的身份，然后每年向它靠近一步。</p>'},
+
+  KXRZ:{stage:'觉醒牛马',state:'已超脱型',tagline:'清醒、认命、还在卷、什么都不说。你是最完美的打工人标本。令人心疼。',
+    analysis:'<p>你是这16种类型里外部表现最稳定的一种，也是内部状态最难被外界感知的一种。你有完整的自我认知，清楚地知道自己在一个怎样的系统里做怎样的事，你接受了这个现实，你还在认真执行，你什么都没说。从外面看，你是沉默的高手；从里面看，你是一个完整运转但没有出口的精密系统。</p><p>这种状态的危险在于：它非常稳定，稳定到让你自己也忘记了它是有代价的。你不内耗，因为你已经接受；你不抱怨，因为你觉得说了也没用；你继续卷，因为你知道不卷的结果。这是一种高度理性的生存策略，但长期来看，它可能让你在某个时刻突然失去所有动力，因为你从来没有真正为自己"活"过。</p>',
+    strengths:'<p>极高的稳定性和可靠性，是组织里的定海神针；不制造摩擦，能在复杂政治环境下平稳运作；自我消化能力超强，不依赖外部认可；判断力清晰，不轻易被虚假信息带跑。</p>',
+    limits:'<p>几乎没有情绪出口，长期风险高；不表达意味着被误解也不纠正，权益容易被忽视；内心和外部表现的割裂感会随时间加深；缺乏从外部获得真实支持的能力。</p>',
+    boss:'<p>你的上司通常对你印象极好，因为你不抱怨、能产出、态度稳定。但这也意味着你在晋升谈判、涨薪要求、职业发展上几乎是隐形的——因为你从来不开口。建议强迫自己每半年做一次主动的职业对话，把你的期待、贡献、和想要的东西明确说出来。不说，永远不会有人猜到。</p>',
+    peers:'<p>同事觉得你神秘又靠谱。没人真正了解你，但大家都信任你。这是一种有距离感的尊重。如果你想建立真实的职场盟友关系，需要主动打开一点——不需要倾诉，只需要偶尔展示一点真实的看法或感受，让别人有机会走近你。</p>',
+    reports:'<p>你的下属可能既尊重你又摸不透你。你不轻易表态，让他们很难判断自己做得对不对。建议建立定期反馈机制，哪怕只是简短的"这个做得好"或"这里可以改进"。你的评价对他们权重很高，不要因为自己的沉默风格让他们在黑暗里猜测。</p>',
+    moneyCore:'<p>你是天然的独立工作者和高价值专业人才。你不需要太多管理，能自驱，质量稳定——这在自由职业市场上溢价极高。建议认真考虑在主业之外建立独立的专业身份：顾问、专家、独立研究者。你的稳定性和判断力是市场稀缺品。</p>',
+    moneySide:'<p>你适合那些需要高可靠性和独立判断的副业：数据咨询、专业写作、行业研究、独立课程。你不需要做营销，做好口碑转介绍就够了——因为你交付的质量会说话。</p>',
+    moneyLong:'<p>你的长期财富风险不是能力不够，而是缺乏能见度——好机会很少主动找上沉默的人。建议建立一个"最小可见度"策略：不需要成为网红，但要让行业里的关键人物知道你的存在和能力。写一篇行业文章、参加一次圈内交流、主动认识三个关键人，足矣。</p>'},
+
+  KMYD:{stage:'人形牛马',state:'定时炸弹型',tagline:'感觉麻了，但嘴还没麻。身体在自动运转，大脑在持续输出不满。一个行走的矛盾体。',
+    analysis:'<p>你是一个内部感知已经逐渐钝化，但语言系统还没跟上的人。你的身体已经适应了高压，痛感在减弱——很多让别人崩溃的事情，你已经不太有感觉了。但你还是会说，还是会抱怨，还是会对不合理的事发出声音。只是这种声音越来越像是一种习惯反射，而不是真实情绪的表达。</p><p>这种状态有一种奇异的稳定性：你麻了所以不会真的崩，你说了所以也不会积压到爆炸。但风险在于：你失去了真实感知的能力，无法准确判断自己的边界在哪里，直到某天身体以另一种方式告诉你。</p>',
+    strengths:'<p>高度的环境适应能力；不会因为情绪而停止执行；敢于直接表达，不憋着；在混乱环境中依然能维持输出。</p>',
+    limits:'<p>感知钝化导致无法及时识别危险信号；抱怨已成习惯，开始失去推动改变的实际效力；可能因为麻木而接受了本不应接受的对待；"说但不动"的模式可能让周围人觉得你只会抱怨。</p>',
+    boss:'<p>你和上司的关系取决于上司的容忍度。你会直说，有时候说得不合时宜。建议学会区分：哪些话是有战略价值的，哪些只是情绪宣泄。前者值得说，后者在更安全的场合处理。上司最怕的不是你有想法，而是你的表达方式让他们觉得难以管理。</p>',
+    peers:'<p>同事私下觉得你真实，但公开场合有时会对你的直接感到不安。你是团队里的"敢说真话的人"，这有价值，但需要一定的时机感。找到那个平衡点：说该说的，在对的场合说。</p>',
+    reports:'<p>你对下属直接，这是优点。但你的抱怨模式如果在下属面前暴露太多，会传递一种"这个团队/公司没有希望"的信号，影响士气。在下属面前，尽量把你的"说"转化成建设性的——不是"这太烂了"，而是"我们来想想怎么解决这个问题"。</p>',
+    moneyCore:'<p>你的核心优势是适应力和执行力，加上直接的沟通风格。销售、客户成功、业务拓展类岗位非常适合你——你不怕被拒绝，能直接沟通，还能在高强度环境下持续干。这类岗位的收入天花板通常也更高，因为和绩效直接挂钩。</p>',
+    moneySide:'<p>你适合做有明确目标和即时反馈的副业：接案销售、推广分销、业务顾问。你不怕和人打交道，这在副业里是稀缺品。避免选择需要长期默默耕耘才有回报的方向，那不适合你的节奏。</p>',
+    moneyLong:'<p>你最需要的是把"能说"转化为"能卖"的能力。你不缺表达，缺的是把表达产品化：把你的经验、判断、直接沟通的能力打包成可以出售的服务。这一步跨过去，你的赚钱路径会大幅拓宽。</p>'},
+
+  KMYZ:{stage:'人形牛马',state:'内耗晚期',tagline:'麻了，卷着，什么都藏着。不确定自己有没有感觉，但每天准时打卡。最高阶的牛马形态。',
+    analysis:'<p>你是这16种类型里最"省电"的一种，同时也是最难被外界感知和帮助的一种。你已经不太确定自己有没有感觉——不是因为你没感觉，而是因为你的感知系统和表达系统之间建立了一道非常厚的隔音墙。痛苦进来了，但被消音了，出不去。</p><p>这种状态会让你在外部系统里运转得非常平稳——没有人知道你在经历什么，因为你自己也不太确定。但这道墙会越建越厚，直到有一天你发现你对几乎所有事情都失去了感受——不是平静，而是空洞。这是需要认真对待的信号。</p>',
+    strengths:'<p>极度稳定，不制造任何外部噪音；执行力保持在线，不受情绪干扰；自我消化能力极强；在任何环境下都能维持基础功能。</p>',
+    limits:'<p>情绪和感知系统长期被压制，有崩溃的潜在风险；无法从外部获得真实支持，因为没人知道你需要；自我认知可能逐渐模糊，不清楚自己真正想要什么；很容易被过度使用，因为永远"看起来没问题"。</p>',
+    boss:'<p>你对上司来说是理想员工，但这本身就是问题——你太好用了，导致没有人想改变现状。你需要学会偶尔"有点难搞"：提出合理的资源需求、给出明确的优先级边界、说清楚你的期待。不是要制造冲突，而是让对方意识到你是一个有边界的人。</p>',
+    peers:'<p>同事几乎不知道你在想什么。你没有麻烦过任何人，也没有真正帮助到任何人建立真实的连接。这种孤立不是你的错，但需要你主动打破。找一个你觉得还可以的同事，试着说一句真实的话，哪怕很小。关系就是从这里开始的。</p>',
+    reports:'<p>你对下属的影响力是潜移默化的——你的沉默和自我压制可能让下属觉得"在这里就是这样，说了也没用"。如果你想带出一个有活力的团队，需要主动打破这个文化，示范"说出来是安全的"。</p>',
+    moneyCore:'<p>你适合那些真正依赖独立判断和高质量输出的工作，而不是依赖展示和人际关系的岗位。技术型专家、独立分析师、专业写作者——这些领域里，你的稳定性和深度是真实竞争力。</p>',
+    moneySide:'<p>选择一个你能在安静状态下进行的副业：线上接单（设计/开发/写作）、录制付费课程、写技术文章。不需要表演，不需要大量社交，只需要把你的能力打包输出。从一个小项目开始，找到节奏。</p>',
+    moneyLong:'<p>你的长期财富风险是"隐身"——你的能力从来没有足够的曝光度，所以好机会很少找上门。建议建立一个最小化的外部可见度：一个专业账号、几篇有署名的文章、一个你愿意说话的小圈子。你不需要成为公众人物，只需要让对的人看到你。</p>'},
+
+  KMRD:{stage:'人形牛马',state:'诈尸型振作',tagline:'麻了，认了，还能笑着说"还好还好"。你不知道自己是真的想开了，还是已经彻底断线。',
+    analysis:'<p>你完成了某种意义上的"打工人终极修炼"——你已经不太感觉得到了，你也接受了现实，你还能对人表现出积极的样子。从外部看，你是最省心的员工、最稳定的朋友、最没有麻烦的同事。问题是：这一切都是在没有真实情绪驱动的情况下发生的。</p><p>你的振作是一种反射弧，而不是来自真实的内驱力。就像手机没有电了还在亮屏——可以撑一段时间，但本质上已经进入了另一种状态。你需要定期问自己：我现在做这些，到底是因为什么？如果答案越来越空洞，那就是需要认真面对的信号。</p>',
+    strengths:'<p>极强的人际稳定性，不制造负面情绪；能在任何状态下维持专业表现；接受现实的能力强，不纠结；被动的智慧——知道什么时候该放手。</p>',
+    limits:'<p>内驱力逐渐空洞化，做事越来越依赖惯性；无法区分"真的好了"和"已经感觉不到了"；长期低能耗模式可能错过真正有意义的机会；周围人可能误以为你一直很好，无法给你真实的支持。</p>',
+    boss:'<p>你和上司几乎没有冲突，但这不代表关系好——代表你从来不争。建议在关键时刻（涨薪、晋升、重要项目分配）主动开口。你已经足够省心了，现在需要学会"适当给自己争一争"。你的积累是真实的，但没有人会在你沉默的时候主动想到你。</p>',
+    peers:'<p>你是办公室里最受欢迎的那种人：没有摩擦，有点幽默，看起来挺好的。但你和同事之间的关系往往停留在表面，因为你从来不展示真实的状态。如果你想要真正的职场盟友，需要偶尔展示一点点真实的脆弱或需求，给别人一个靠近你的机会。</p>',
+    reports:'<p>你对下属宽容，不制造压力，是很多人喜欢的那种上级。但你的"什么都可以"有时会让下属缺乏方向感。建议在重要事项上明确你的期待，让下属知道标准在哪里，而不是靠猜。</p>',
+    moneyCore:'<p>你的核心优势是稳定性和人际协调能力。最适合：项目管理、客户成功、运营类岗位。这些岗位需要的恰恰是你擅长的：保持冷静、协调多方、稳定交付。在这些领域深耕，你的天花板比你以为的高。</p>',
+    moneySide:'<p>你适合做有固定流程、可以批量化的副业：内容代运营、模板制作销售、线上课程制作（不需要你每次都重新表演热情）。找到一个可以复制的模式，让它自动运转。</p>',
+    moneyLong:'<p>你的财富积累最需要的是"主动性"这一剂。你有能力，有稳定性，缺的是主动争取的欲望。建议给自己设置一个外部目标——比如三年内达到某个收入水平——然后逆向拆解成每个季度需要做什么。有了外部锚点，你的执行力会自动跟上。</p>'},
+
+  KMRZ:{stage:'人形牛马',state:'已超脱型',tagline:'麻了，认了，不说了，还在卷。你已超越"人"的范畴，进化成精密的产出机器。恭喜。',
+    analysis:'<p>你达到了打工人进化的某种终极形态。所有的系统——情绪、期待、抗拒、表达——都已经降噪完毕。你运转，你产出，你不抱怨，你不期待，你什么都不说。从外部看，你是最理想的员工；从某种哲学角度看，你完成了一种极端的自我消解。</p><p>这种状态有其独特的宁静。你不内耗，因为你不期待；你不焦虑，因为你不在乎结果。但这种宁静的另一面，是你几乎失去了驱动自己去追求任何"更好"的能力。你的引擎还在转，但不知道开往哪里——或者说，你已经不问这个问题了。这是需要重新检视的时刻。</p>',
+    strengths:'<p>极度稳定，在任何环境下都能维持高水平输出；不制造任何摩擦，协作成本极低；自我维护能力强，不需要外部持续关注；有一种独特的超然气质，让人觉得靠谱。</p>',
+    limits:'<p>内驱力几乎归零，行动全靠惯性；对好机会反应迟钝，因为"都无所谓了"；几乎没有外部可见度，容易被忽视；长期来看可能对自我身份感产生侵蚀。</p>',
+    boss:'<p>上司对你满意，但满意的是你的产出，不是你这个人。你在职业发展上几乎是透明的——既不争取，也不拒绝，结果就是被安排。建议每年至少做一次主动的职业规划对话，告诉上司你想去哪里，而不是永远被动接受安排。</p>',
+    peers:'<p>同事觉得你深不可测，有时候觉得你有点冷。你不是真的冷，只是所有的互动对你来说都消耗不多，所以也不主动投入。如果你想在职场上建立有价值的关系网络，需要有意识地投入时间，哪怕只是午饭时的15分钟真实交流。</p>',
+    reports:'<p>你对下属影响最大的，是你展示出的那种"不在乎"——这会被解读为成熟，但也可能被解读为放弃。在带人时，需要有意识地展示方向感和期待，让下属知道他们在为什么而努力，而不只是机械执行。</p>',
+    moneyCore:'<p>你是专家型人才的理想雏形。你的稳定性和质量是市场稀缺品，但你需要把自己"展示出来"。考虑建立独立的专业身份：在你的专业领域写作、分享、积累影响力。你不需要表演热情，只需要展示深度——而深度你是真实拥有的。</p>',
+    moneySide:'<p>你适合做完全自驱、按自己节奏进行的副业：独立咨询、专业写作、线上课程、SaaS工具（如果有技术背景）。关键是：选一个方向，在你愿意投入时就认真做，不要强迫自己每天都很亢奋。你的优势是长期稳定，不是短期爆发。</p>',
+    moneyLong:'<p>你已经积累了大量的能力和经验，现在需要的是"兑现"的动作。考虑把你的专业能力商品化：把你会的事情打包成服务、课程、工具或内容，让它在你不需要主动付出时间的情况下持续产生价值。你的现在是别人的目标状态，这本身就是可以变现的资产。</p>'},
+
+  TXYD:{stage:'清醒摆烂',state:'定时炸弹型',tagline:'感觉得到，有意见，还是选择躺。这是最有自我意识的摆烂。你躺得有理有据。',
+    analysis:'<p>你是这16种类型里摆烂摆得最有尊严的一种。你不是因为没感觉才躺，不是因为认命才躺——你是因为看清楚了这个游戏的规则，判断出当前这种卷法的性价比，然后理性地选择了躺。而且你还能把这件事说清楚，逻辑自洽，让人无法反驳。</p><p>这种组合非常难得：既有感知力，又有行动力（只是选择不用在这里），还有表达力。你的躺不是消极，是一种有意识的资源分配——你把有限的精力，分配给了你认为值得的地方。只是别人不一定理解这一点。</p>',
+    strengths:'<p>高度的自我意识和判断力；不轻易被环境裹挟；敢于说出大多数人只敢想的话；对什么值得投入、什么不值得有清醒的认知。</p>',
+    limits:'<p>"值得"的标准可能随时间漂移，导致什么都不做；表达欲强但行动力在选择范围内，容易给人"只说不做"的印象；在职场系统中可见度低，容易被认为不够上进；对自己的判断过于自信，有时候会错过真正值得的机会。</p>',
+    boss:'<p>你和大多数传统上司的关系会比较紧张，因为你不装、不配合、还敢说。建议找到一个你能发自内心尊重的上司——一个你认为"这个人值得我卷"的人。如果没有，那就诚实评估你在当前环境里的长期价值，不要因为"躺"的姿态而错失真正值得投入的机会。</p>',
+    peers:'<p>你是同事里的精神领袖，大家私下都觉得你说的有道理，但公开场合没人敢跟你一起"躺"，因为他们还没想清楚。你的存在本身对团队文化有影响——这是权力，也是责任。用好它。</p>',
+    reports:'<p>如果你有下属，要小心你的"理性摆烂"对他们的影响。你的清醒对他们有启发价值，但如果过度输出"这没有意义"的信息，会干扰他们自己做判断。下属需要在自己的时间轴上找到自己的答案，你可以分享观点，但不要替他们做结论。</p>',
+    moneyCore:'<p>你最适合的赚钱方式是把你的判断力直接变现：咨询、策略顾问、内容创作。你有能力快速看清楚一件事的本质，而这种能力在市场上是稀缺的。关键是：找到一个你真正愿意投入的领域，然后在那里全力以赴——你有这个能力，只需要找到那个值得的地方。</p>',
+    moneySide:'<p>你最适合的副业是那种可以"想清楚了再做"的类型：深度内容写作、付费咨询、行业分析。你不适合需要每天打卡、持续输出、靠量取胜的副业——那和你的节奏不符。选一个你真实感兴趣的细分领域，在那里建立深度壁垒。</p>',
+    moneyLong:'<p>你的长期财富路径取决于你能否找到一个真正让你愿意卷的事情。你的潜力是真实的，问题是你的精力一直在等待那个"值得"的目标。建议主动去找，而不是等它自动出现——试错是找到它的必要成本，而不是浪费。</p>'},
+
+  TXYZ:{stage:'清醒摆烂',state:'内耗晚期',tagline:'躺着，清醒，有很多话，一句都不说。你在静静地消化这个荒诞的世界。',
+    analysis:'<p>你是一个深刻的观察者。你看到了，你感受到了，你也有大量的想法和判断——但你选择了沉默。不是因为你不想说，而是因为你已经预演过说了之后的结果，判断说了也没什么用，所以干脆不说。与此同时，你也已经不卷了，因为你判断那条路性价比不高。</p><p>这种状态在外部看来非常平静，甚至有一种超然感。但在内部，你的认知系统一直在运转——分析、判断、消化，然后再压下去。这是一种高强度的内部活动，只是不产生外部可见的输出。长期来看，这些积压的判断和感受需要一个出口，否则会以其他方式寻找出路。</p>',
+    strengths:'<p>深度思考能力；不被外部噪音干扰；对事物有透彻的判断；在混乱中保持内心的某种秩序。</p>',
+    limits:'<p>输出不足导致价值无法被外界看见；沉默可能被误读为冷漠或不作为；内部积压的判断和感受缺乏出口；选择性退出可能错过真正值得参与的机会。</p>',
+    boss:'<p>你的上司大概不太了解你，也不知道你真实的想法和能力。你在他们眼里可能是"还行但不突出"。如果你想改变这个局面，需要找一两个场合展示你的判断力——不需要多，但需要精准。一次真正有质量的发言，胜过十次沉默。</p>',
+    peers:'<p>同事觉得你神秘，有时候难以亲近。你不是真的冷漠，只是觉得大多数对话成本高收益低。试着找到一两个你觉得"还算值得聊"的同事，建立真实的关系。这不仅对你的心理健康有帮助，对你的职业发展也是关键资源。</p>',
+    reports:'<p>如果你有下属，他们最大的困惑是不知道你的想法。你的沉默对他们是一种压力，因为他们在黑暗里猜测。建议建立一个简单的反馈节奏，哪怕只是短暂的定期对话，让他们知道你在看，你在乎，你有期待。</p>',
+    moneyCore:'<p>你的核心资产是思维深度，但你需要找到一个把它变成可见输出的方式。写作是最直接的路径——你有想法，你有判断，现在需要的是把它们写下来。专业写作、分析报告、深度内容，都是你的天然变现方向。</p>',
+    moneySide:'<p>你适合做那种"一次性深度投入"的副业：写一本行业白皮书、开发一个专业工具、录制一套深度课程。这些都是你可以在自己节奏下完成的事，而且做好了价值持久。避免选择需要频繁互动和即时响应的副业，那会消耗你的能量。</p>',
+    moneyLong:'<p>你的思维深度是一种稀缺资产，但它需要被"激活"才能产生价值。建议找到一个你愿意长期深耕的领域，把你的深度判断系统化地输出出来——不论是文字、产品还是服务。一旦建立起来，这套系统可以在你"不卷"的状态下持续产生回报。</p>'},
+
+  TXRD:{stage:'清醒摆烂',state:'诈尸型振作',tagline:'躺了，想通了，还能对人表现得云淡风轻。你的摆烂有一种令人羡慕的从容感。',
+    analysis:'<p>你完成了一种很多人追求但少有人真正达到的状态：清醒地认识到现实，接受了它，选择了不卷，还能以一种从容的方式面对外界。你看起来不是在放弃，而是在一种更高维度的选择中。朋友问你"为什么不拼一拼"，你能给出让人信服的答案，因为你真的想清楚了。</p><p>这种状态的美妙之处在于：你没有内耗。你不愤怒，不压抑，不假装，你只是选择了一种不同的活法，并且对这个选择感到平和。唯一的风险是：这种平和有时候会变成惰性——当真正好的机会出现时，你可能因为"已经躺了"的惯性而错过。</p>',
+    strengths:'<p>内心平和，不被焦虑驱动；判断力清晰，不随波逐流；能在轻松状态下维持一定的产出质量；对他人有一种自然的吸引力，因为你看起来"活明白了"。</p>',
+    limits:'<p>行动力依赖判断到位，但判断可能因为"都行"而钝化；对好机会可能反应迟钝；从容有时候会被外界解读为不上进；长期低速运转可能在关键时刻发现自己"已经跟不上了"。</p>',
+    boss:'<p>你和上司的关系通常不错，因为你不制造麻烦，说话也有条理。问题是你的"云淡风轻"让上司觉得你对升职、涨薪这些东西没有需求，所以不主动给你。建议偶尔表达一下你的期待，让上司知道你不是真的不在乎，只是不焦虑。</p>',
+    peers:'<p>你是大家喜欢的那种同事：没有戾气，聊得来，还时不时输出一些让人豁然开朗的观点。继续保持，但也要注意不要完全脱离集体——适当参与一些你觉得"还行"的合作，对你的职场关系网络有持续滋养作用。</p>',
+    reports:'<p>你是很好的导师型人物。你有清醒的判断，又不制造焦虑，下属在你这里能找到方向感和安全感。建议在保持从容风格的同时，明确设定清晰的标准和期待——让下属知道什么是你认为真正重要的，而不是什么都"随便"。</p>',
+    moneyCore:'<p>你适合那些需要判断力但不需要高强度持续投入的工作：顾问、策略师、独立评估者。你的"想清楚了"本身就是市场价值——很多人和公司愿意为一个能快速看清楚问题的人付费。把这种能力商品化，是你最直接的变现路径。</p>',
+    moneySide:'<p>你适合建立"轻型副业"：咨询按小时收费、付费社群（你的清醒判断对很多人有价值）、偶尔接一个你感兴趣的项目。不需要把副业变成第二份全职，按你的节奏做，选择你真正愿意做的事。</p>',
+    moneyLong:'<p>你的长期财富路径的关键是：在保持从容的同时，不要对"财富增长"本身也云淡风轻。设定一个明确的财务目标，让它成为你愿意为之付出努力的理由。你不需要很焦虑，但需要有一个方向。</p>'},
+
+  TXRZ:{stage:'清醒摆烂',state:'已超脱型',tagline:'躺着，清醒，认命，沉默。你到达了人类精神的某种边界。外人看你是平静，只有你知道里面装的是什么。',
+    analysis:'<p>你是这16种类型里最接近某种哲学意义上"解脱"的一种。你感受得到，你想清楚了，你接受了，你选择了沉默——四个层面全部完成，没有遗留的摩擦。这不是麻木，是一种主动选择的平静。你知道这个游戏的规则，你知道自己不想玩，你选择了旁观，并且对这个选择感到平和。</p><p>外界看你，看到的是深不可测的平静。你自己知道的，是一种彻底理解之后的宁静——不是因为不在乎，而是因为已经完全看清楚了，所以不需要反应。这种状态是稀缺的，也是有风险的：你的智慧和判断力如果完全不产生任何输出，它本身也会逐渐萎缩。</p>',
+    strengths:'<p>最高级的内心稳定性；完全不受外部情绪波动影响；对事物的本质有深刻理解；不需要外部认可，自我评价体系完整。</p>',
+    limits:'<p>价值几乎不可见，等同于隐身；长期不参与可能导致认知和现实脱节；这种状态下的人际关系几乎无法深入；对自身潜力的极大浪费——你有判断力，但它没有流动。</p>',
+    boss:'<p>你的上司对你的印象是"神秘且不出问题"。你几乎不存在于他的职业决策中。如果你对当前状态满意，这没有问题；如果你想有所改变，需要从一件小事开始重新"出现"：主动提一个建议、对一个项目表达意见、要求一次一对一。</p>',
+    peers:'<p>你在职场中是一个传说般的存在——没人真正了解你，但大家对你有某种直觉上的尊重。如果你想把这种神秘感转化成真实的职场资本，需要偶尔让人看到你的判断力。一次精准的发言比十次沉默更有价值。</p>',
+    reports:'<p>带领下属对你来说是个挑战，因为你的沉默和超然对他们来说很难读懂。他们需要具体的方向、明确的标准、可感知的关注。建议即使你不喜欢，也定期做这些事——这是你对他们的基本责任。</p>',
+    moneyCore:'<p>你是潜在的深度专家，但你的价值完全没有被市场看见。第一步不是赚钱，是"出现"——让你的判断力以某种形式进入公众视野。一旦有了可见度，变现是自然发生的事。选一个你愿意投入的细分领域，开始输出。</p>',
+    moneySide:'<p>你最适合建立那种"做一次，长期有效"的资产：一本书、一个课程、一个工具、一套深度内容。这和你的性格最匹配——不需要持续的社交和表演，只需要一次深度的投入，然后让它自己运转。</p>',
+    moneyLong:'<p>你是这16种类型里财富潜力最被低估的一种。你的问题从来不是能力，而是可见度。一旦你决定"出现"，你的积累会让你走得比大多数人快。所以最重要的决定是：什么时候开始？答案是：现在。</p>'},
+
+  TMYD:{stage:'传说级吗喽',state:'定时炸弹型',tagline:'麻了，躺了，但嘴还没停。你已不在乎了，但还是会骂两句。这是一种自由。',
+    analysis:'<p>你达到了一种奇特的自由状态。你已经麻了——很多事情你已经没有真实的情绪反应了。你也已经躺了——卷的欲望已经基本归零。但是你还在说，还在骂，还在吐槽。这不是因为你还有强烈的情绪，而是因为说话这件事本身已经成了一种习惯，一种不需要情绪支撑的反射。</p><p>这种状态有它独特的魅力：你够真实，你不装，你说话让人觉得痛快，因为那些话不带任何求认可的欲望。你说了，也就那样了，你自己也不在乎结果。这是一种很少有人能达到的表达自由。</p>',
+    strengths:'<p>不被情绪左右，说话直接但无执念；对外部压力高度免疫；不会因为说错话而产生持久的后悔；在混乱环境中能保持某种幽默感。</p>',
+    limits:'<p>没有情绪支撑的表达，有时候让人感觉疏离；行动力接近于无，很难推动任何改变；长期处于这种状态可能对人际关系产生消耗；外界可能觉得你"嘴上说说，没有实质"。</p>',
+    boss:'<p>你和上司之间基本是平行线——你不给他制造大问题，他也不期待你给他创造大价值。如果你对这个状态满意，维持就好。如果你想改变，需要先在某一件事上重新投入——哪怕只是一件，做出真实的成果，让人看到你还有能量。</p>',
+    peers:'<p>同事喜欢和你在一起，因为你说的话让人觉得解压。你是团队里的"嘴强情绪出口"，这有社交价值。但注意不要把所有关系都停留在吐槽层面——偶尔做一件真实的事，比说一千句话更能让人对你刮目相看。</p>',
+    reports:'<p>如果你还有下属，你最大的风险是给他们传递一种"无所谓了"的文化。你的吐槽对他们可能是娱乐，但也可能是方向感的侵蚀。在下属面前，保留你的真实，但有意识地给他们一些正向的锚点。</p>',
+    moneyCore:'<p>你的赚钱方式最好是那种不需要你"在乎"结果的类型：流量内容创作（你的真实感是最好的内容）、按小时的顾问服务（做完就完）、一次性项目接单。找到和你的"不在乎"气质匹配的变现方式，反而能做得最真实。</p>',
+    moneySide:'<p>你最适合的副业是内容创作，特别是吐槽类、真实感强的内容。你说的那些话，很多人想说但说不出来，或者没你说得这么到位。这本身就是稀缺价值。找到一个平台，把你说的话记录下来，就是副业的起点。</p>',
+    moneyLong:'<p>你的长期财富积累的最大障碍是"不在乎"本身。你需要找到一件你真的还在乎的事——哪怕只是一件——然后在那里投入。不需要全面复活，只需要一个突破口。找到那件事，其他的就会跟着动起来。</p>'},
+
+  TMYZ:{stage:'传说级吗喽',state:'内耗晚期',tagline:'麻了，躺了，还在内耗。你以为你不在乎了，但那个声音说明你还差一步。',
+    analysis:'<p>你的状态有一个有趣的矛盾：你已经够麻了，也已经躺了，但你还在内耗。这说明什么？说明你没有真正放下——在你的内部，还有一个声音在运转，在评判，在积压。你不卷，你不说，但你也没有真正静下来。</p><p>这是一种非常特殊的困住状态：你没有行动，你没有表达，你的能量都消耗在内部的运转上。从外面看你非常平静，但内部的消耗其实并不少。你离真正的解脱只差一步——要么把那个内部声音说出来，要么真的放下它，选一个。</p>',
+    strengths:'<p>你比你自己以为的更有感受力；内部的批判性思维依然活跃；有自我意识，能感受到自己的状态；有潜力走向真正的解脱或真正的重新投入。</p>',
+    limits:'<p>能量同时消耗在多个无产出的方向；两头不讨好——既没有行动，也没有真正的平静；长期内耗对身体和认知的损耗是真实的；外部无法感知，无法获得支持。</p>',
+    boss:'<p>你的上司可能完全不知道你内部发生了什么。你看起来还好，所以一切照常。你需要做的是做一个决定：要么在当前环境里找到一个真正的突破口，要么诚实地评估这个环境是否值得继续投入。这个决定做了，内耗就会减少一半。</p>',
+    peers:'<p>和同事的关系对你来说可能是一种不确定的消耗——你有时候想连接，有时候又觉得没意思。试着降低对"关系质量"的期待，从最低成本的互动开始：午饭，咖啡，一条消息。不要等到状态好了再去维持关系。</p>',
+    reports:'<p>如果你有下属，你的内耗可能会以一种微妙的方式影响他们——他们感受得到你的状态，即使你没说什么。建议在和下属互动时，有意识地呈现清晰的方向和期待，让他们的工作锚点不依赖于你的情绪状态。</p>',
+    moneyCore:'<p>你目前最重要的不是选什么赚钱方式，而是先解决内耗问题——因为内耗是在悄悄消耗你本可以用于赚钱的精力。找到内耗的源头（未完成的决定？错误的预期？），先处理它，然后再谈变现。</p>',
+    moneySide:'<p>选一个门槛最低的副业先启动：接一个小单，写一篇文章，做一次咨询。不是为了钱，是为了打破"什么都没动"的状态。行动会减少内耗，比任何思考都有效。</p>',
+    moneyLong:'<p>你有潜力走向两个方向：彻底解脱之后的轻盈高效，或者重新找到值得投入的目标。不论哪个方向，前提都是先做一个决定，然后让行动打破现在这个僵局。你已经积累了足够的感知力和判断力，现在需要的只是一个开始的动作。</p>'},
+
+  TMRD:{stage:'传说级吗喽',state:'诈尸型振作',tagline:'麻了，躺了，认了，还能笑。你达到了普通打工人难以企及的精神境界。你是传说。',
+    analysis:'<p>恭喜你完成了四重修炼：感知系统已经平静（麻了），行动系统已经放下（躺了），认知系统已经接受（认了），表达系统还能输出正向信号（能笑）。这是某种意义上的打工人终极形态——既没有痛苦，也没有妄想，还能和周围的世界保持和谐的表面关系。</p><p>外人看你，看到的是"活通透了"。你自己知道，这不一定是通透，可能只是一种经历了足够多之后形成的平衡态。这种平衡是稳定的，也是有温度的——你的笑是真实的，即使它不来自热情。你是这个系统里的智者，只是你的智慧不需要被任何人承认。</p>',
+    strengths:'<p>极度稳定，内外都不制造摩擦；对外能传递温暖和安定感；不被外部评价影响；有真实的生活智慧，是身边人的精神锚点。</p>',
+    limits:'<p>行动力几乎为零，很难启动新的事情；"传说"状态容易让人以为你已经活在另一个层面，而不主动寻求帮助；内驱力的缺失意味着好机会来了也可能无动于衷；长期来看有可能从平衡态滑向真正的虚无感。</p>',
+    boss:'<p>你和上司的关系通常是稳定的，因为你不给他制造麻烦，还时不时能稳定团队情绪。问题是你对职业发展几乎没有主动诉求，所以也不会主动得到什么。如果你还想要某些东西，需要明确说出来——上司不会为你猜测你在传说境界里还需要什么。</p>',
+    peers:'<p>你是团队里的老灵魂，大家遇到困惑会来找你聊，因为你不焦虑、有见地、还会笑着回应。这是真实的价值。继续做这个角色，但也偶尔让人帮助你——给别人一个靠近你的机会，而不是永远是那个给出答案的人。</p>',
+    reports:'<p>你是下属梦想中的那种上级：不PUA，有智慧，压力小。但你需要在"佛系"和"方向感"之间找到平衡。下属需要知道什么是对的、什么是错的、努力的方向在哪里。你的传说境界不能替代这些基本的管理责任。</p>',
+    moneyCore:'<p>你最自然的赚钱方式是成为某种意义上的"精神资产"——顾问、导师、长期合作伙伴。人们愿意为稳定、有智慧、不焦虑的人付长期的费用。你需要的是找到愿意为这种价值付费的场景，然后让自己"被看见"。</p>',
+    moneySide:'<p>你适合那种长期、稳定、不需要频繁爆发的副业：付费社群、长期咨询关系、版税型收入（写作、课程）。你的稳定性是最大的资产，选择那些能让这种稳定性长期产生价值的方向。</p>',
+    moneyLong:'<p>你已经接近了很多人追求的那种精神状态，现在需要的是把这种状态兑换成有形的资产。不需要焦虑，但需要一个清晰的长期财务目标，让你的稳定性和智慧有一个具体的方向。你不缺智慧，缺的是把智慧变成资产的那个动作。</p>'},
+
+  TMRZ:{stage:'传说级吗喽',state:'已超脱型',tagline:'麻了，躺了，认了，沉默。你不属于这个维度了。我们叫不醒你，因为你没有睡着——你只是不想回来了。',
+    analysis:'<p>你是NHTI能测出的最终形态。所有的系统都已经完成了它们的旅程：感知系统平静了（麻了），行动系统放下了（躺了），认知系统接受了（认了），表达系统关闭了（沉默）。从外界看，你是一个谜——平静到让人不确定你是否还在。</p><p>你没有痛苦，也没有期待，没有焦虑，也没有热情。你存在于当下，完全，安静。这是一种罕见的状态。它可以是真正的解脱——经历了足够多之后抵达的那种宁静。它也可以是一种需要被温柔对待的信号——当一个人对所有事情都失去了反应，也许需要找一个可以说话的人，问问自己"我还想要什么"。</p>',
+    strengths:'<p>最高级别的内心稳定性；完全不受外部波动影响；有一种难以被打扰的宁静；积累了最完整的"经历之后的智慧"。</p>',
+    limits:'<p>对外几乎隐形；好机会来了也无动于衷；这种状态边界模糊——很难区分是真正的解脱还是深层的疲惫；如果是后者，需要被看见和支持，而不是继续沉默。</p>',
+    boss:'<p>你的上司对你的印象可能是"存在感很低，但不出问题"。这是一种稳定但被动的职场状态。如果你想有所改变，需要从最小的动作开始：参与一次你通常不会参与的讨论，提一个你有判断的建议。从那里开始。</p>',
+    peers:'<p>你对同事来说是一个有距离感的存在。不是因为你排斥他们，而是因为你已经不需要什么了，所以连接的需求也很低。但人类是需要连接的——即使你觉得不需要，也试着偶尔主动一下。关系是需要维护的，和你的状态无关。</p>',
+    reports:'<p>对下属来说，你是最难跟随的那种Leader——因为你不给信号，不给方向，也不给反馈。他们在你的沉默里找不到锚点。如果你还在一个管理的位置上，需要有意识地打破这种沉默，给他们基本的引导和反馈，这是你对他们承担的责任。</p>',
+    moneyCore:'<p>你的价值是真实的，但它被你的沉默完全封印了。第一步不是选择变现方式，而是做一件事：让某一个你的想法或判断进入某一个人的视野。从一个人开始，不需要公众，只需要一个真实的连接。</p>',
+    moneySide:'<p>如果你愿意做一件事，选择那种一次性深度投入、长期自动产生价值的类型：写一本书、开发一个工具、创作一套完整的课程。不需要持续的社交和表演，只需要你愿意在某个时刻完全投入一次。</p>',
+    moneyLong:'<p>你是这16种类型里最被低估的一种——因为你的积累是真实的，但完全没有流动。你的智慧、经历、判断力，都是真实的资产，只是被封存在沉默里。找到那个你愿意为之开口的理由，哪怕只有一个。那个理由，就是你重新开始的地方。</p>'},
 };
 
-// ═══ 状态 ═══
-let current = 0;
-let scores = { KT: { K: 0, T: 0 }, XM: { X: 0, M: 0 }, YR: { Y: 0, R: 0 }, DZ: { D: 0, Z: 0 } };
-const aKeys = { KT: 'K', XM: 'X', YR: 'Y', DZ: 'D' };
-const bKeys = { KT: 'T', XM: 'M', YR: 'R', DZ: 'Z' };
-const dimLabels = { KT: '卷 / 躺', XM: '醒 / 麻', YR: '怨 / 认', DZ: '显 / 藏' };
+const aKeys={KT:'K',XM:'X',YR:'Y',DZ:'D'};
+const bKeys={KT:'T',XM:'M',YR:'R',DZ:'Z'};
+const dimFullA={KT:'卷（K）',XM:'醒（X）',YR:'怨（Y）',DZ:'显（D）'};
+const dimFullB={KT:'躺（T）',XM:'麻（M）',YR:'认（R）',DZ:'藏（Z）'};
 
-function startQuiz() {
-  showScreen('screen-quiz');
-  renderQuestion();
+let current=0;
+let netScores={KT:0,XM:0,YR:0,DZ:0};
+let answers=[]; // {dim, score} per question
+
+function startQuiz(){
+  current=0; netScores={KT:0,XM:0,YR:0,DZ:0}; answers=[];
+  showScreen('screen-quiz'); renderQuestion();
 }
 
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
 
-function renderQuestion() {
-  const q = questions[current];
-  const pct = Math.round((current / questions.length) * 100);
-
-  document.getElementById('q-counter').textContent = `第 ${current + 1} 题 / 共 ${questions.length} 题`;
-  document.getElementById('q-pct').textContent = pct + '%';
-  document.getElementById('progress-fill').style.width = pct + '%';
-  document.getElementById('dim-tag').textContent = dimLabels[q.dim] + ' 维度';
-  document.getElementById('question-text').textContent = q.text;
-
-  const container = document.getElementById('options-container');
-  container.innerHTML = `
-    <button class="opt-btn" onclick="answer('a')">
-      <span class="opt-label">A</span>
-      <span>${q.a}</span>
-    </button>
-    <button class="opt-btn" onclick="answer('b')">
-      <span class="opt-label">B</span>
-      <span>${q.b}</span>
-    </button>
-  `;
+function renderQuestion(){
+  const q=questions[current];
+  const pct=Math.round((current/questions.length)*100);
+  document.getElementById('q-counter').textContent=`第 ${current+1} 题 / 共 ${questions.length} 题`;
+  document.getElementById('q-pct').textContent=pct+'%';
+  document.getElementById('progress-fill').style.width=pct+'%';
+  document.getElementById('dim-tag').textContent=`第 ${current+1} / ${questions.length}`;
+  document.getElementById('question-text').textContent=q.text;
+  document.getElementById('scale-wrap').innerHTML=SCALE.map(s=>
+    `<button class="scale-btn" onclick="answer(${s.score},'${q.dim}')">
+      <span class="scale-dot ${s.cls}"></span><span>${s.label}</span>
+    </button>`).join('');
+  document.getElementById('btn-back').style.display = current>0 ? 'inline-block' : 'none';
 }
 
-function answer(choice) {
-  const q = questions[current];
-  const key = choice === 'a' ? aKeys[q.dim] : bKeys[q.dim];
-  scores[q.dim][key]++;
+function answer(score,dim){
+  answers.push({dim,score});
+  netScores[dim]+=score;
   current++;
-  if (current >= questions.length) {
-    showResult();
-  } else {
-    // brief fade
-    const quiz = document.getElementById('screen-quiz');
-    quiz.style.opacity = '0';
-    quiz.style.transition = 'opacity .15s';
-    setTimeout(() => {
-      renderQuestion();
-      quiz.style.opacity = '1';
-    }, 150);
-  }
+  if(current>=questions.length){showResult();return;}
+  const quiz=document.getElementById('screen-quiz');
+  quiz.style.opacity='0';quiz.style.transition='opacity .15s';
+  setTimeout(()=>{renderQuestion();quiz.style.opacity='1';},150);
 }
 
-function showResult() {
-  // Determine poles
-  const kt = scores.KT.K >= scores.KT.T ? 'K' : 'T';
-  const xm = scores.XM.X >= scores.XM.M ? 'X' : 'M';
-  const yr = scores.YR.Y >= scores.YR.R ? 'Y' : 'R';
-  const dz = scores.DZ.D >= scores.DZ.Z ? 'D' : 'Z';
-  const code = kt + xm + yr + dz;
-  const r = results[code];
+function goBack(){
+  if(current<=0) return;
+  current--;
+  const last=answers.pop();
+  netScores[last.dim]-=last.score;
+  const quiz=document.getElementById('screen-quiz');
+  quiz.style.opacity='0';quiz.style.transition='opacity .15s';
+  setTimeout(()=>{renderQuestion();quiz.style.opacity='1';},150);
+}
 
-  document.getElementById('r-stage').textContent = r.stage;
-  document.getElementById('r-state').textContent = r.state;
-  document.getElementById('r-code').textContent = `[ ${code} ]`;
-  document.getElementById('r-desc').textContent = r.desc;
+function showResult(){
+  const kt=netScores.KT>=0?'K':'T';
+  const xm=netScores.XM>=0?'X':'M';
+  const yr=netScores.YR>=0?'Y':'R';
+  const dz=netScores.DZ>=0?'D':'Z';
+  const code=kt+xm+yr+dz;
+  const r=R[code];
 
-  // Dim cards
-  const dimData = [
-    { label:'卷 / 躺', result: kt === 'K' ? '卷（K）' : '躺（T）', pct: Math.round(scores.KT[kt] / 10 * 100), score: `${scores.KT.K} 卷 / ${scores.KT.T} 躺` },
-    { label:'醒 / 麻', result: xm === 'X' ? '醒（X）' : '麻（M）', pct: Math.round(scores.XM[xm] / 10 * 100), score: `${scores.XM.X} 醒 / ${scores.XM.M} 麻` },
-    { label:'怨 / 认', result: yr === 'Y' ? '怨（Y）' : '认（R）', pct: Math.round(scores.YR[yr] / 10 * 100), score: `${scores.YR.Y} 怨 / ${scores.YR.R} 认` },
-    { label:'显 / 藏', result: dz === 'D' ? '显（D）' : '藏（Z）', pct: Math.round(scores.DZ[dz] / 10 * 100), score: `${scores.DZ.D} 显 / ${scores.DZ.Z} 藏` },
+  document.getElementById('r-stage').textContent=r.stage;
+  document.getElementById('r-state').textContent=r.state;
+  document.getElementById('r-code').textContent='[ '+code+' ]';
+  document.getElementById('r-tagline').textContent=r.tagline;
+
+  const dims=[
+    {dim:'KT',pole:kt},{dim:'XM',pole:xm},{dim:'YR',pole:yr},{dim:'DZ',pole:dz}
   ];
-  document.getElementById('r-dims').innerHTML = dimData.map(d => `
-    <div class="dim-card">
-      <div class="dc-label">${d.label}</div>
-      <div class="dc-result">${d.result}</div>
-      <div class="dc-bar-wrap"><div class="dc-bar" style="width:${d.pct}%"></div></div>
-      <div class="dc-score">${d.score}</div>
-    </div>
-  `).join('');
+  document.getElementById('r-dims').innerHTML=dims.map(d=>{
+    const pct=Math.min(100,Math.round(Math.abs(netScores[d.dim])/20*100));
+    const val=netScores[d.dim]>=0?dimFullA[d.dim]:dimFullB[d.dim];
+    return `<div class="dim-card">
+      <div class="dc-lbl">${dimLabels[d.dim]}</div>
+      <div class="dc-val">${val}</div>
+      <div class="dc-bar-wrap"><div class="dc-bar" style="width:${pct}%"></div></div>
+      <div class="dc-score">倾向强度 ${pct}%</div>
+    </div>`;
+  }).join('');
 
-  // Share text
-  const shareStr = `我做了 NHTI 牛马人格诊断，结果是：\n\n【${r.stage} · ${r.state}】\n\n"${r.desc.slice(0, 60)}……"\n\n你是哪种牛马形态？`;
-  document.getElementById('share-content').textContent = shareStr;
+  document.getElementById('r-analysis').innerHTML=r.analysis;
+  document.getElementById('r-strengths').innerHTML=`<p>${r.strengths}</p>`;
+  document.getElementById('r-limits').innerHTML=`<p>${r.limits}</p>`;
+  document.getElementById('r-boss').innerHTML=`<p>${r.boss}</p>`;
+  document.getElementById('r-peers').innerHTML=`<p>${r.peers}</p>`;
+  document.getElementById('r-reports').innerHTML=`<p>${r.reports}</p>`;
+  document.getElementById('r-money-core').innerHTML=`<p>${r.moneyCore}</p>`;
+  document.getElementById('r-money-side').innerHTML=`<p>${r.moneySide}</p>`;
+  document.getElementById('r-money-long').innerHTML=`<p>${r.moneyLong}</p>`;
+
+  document.getElementById('share-box').textContent=
+    `我做了 NHTI 牛马人格诊断，结果是：\n\n【${r.stage} · ${r.state}】[${code}]\n\n"${r.tagline}"\n\nhttps://edenlu005.github.io/nhti/`;
+
+  // 保存到 localStorage
+  try {
+    localStorage.setItem('nhti_result', JSON.stringify({
+      code, netScores:{...netScores},
+      label:`${r.stage} · ${r.state}`,
+      ts: Date.now()
+    }));
+  } catch(e){}
 
   showScreen('screen-result');
 }
 
-function copyShare() {
-  const text = document.getElementById('share-content').textContent;
-  navigator.clipboard.writeText(text).then(() => {
-    const t = document.getElementById('toast');
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2000);
-  });
+function switchTab(i){
+  document.querySelectorAll('.tab-btn').forEach((b,j)=>b.classList.toggle('active',j===i));
+  document.querySelectorAll('.tab-content').forEach((c,j)=>c.classList.toggle('active',j===i));
 }
 
-function retake() {
-  current = 0;
-  scores = { KT: { K: 0, T: 0 }, XM: { X: 0, M: 0 }, YR: { Y: 0, R: 0 }, DZ: { D: 0, Z: 0 } };
+function copyShare(){
+  navigator.clipboard.writeText(document.getElementById('share-box').textContent)
+    .then(()=>showToast('已复制到剪贴板 ✓'))
+    .catch(()=>showToast('请长按手动复制'));
+}
+
+function retake(){
+  current=0; netScores={KT:0,XM:0,YR:0,DZ:0}; answers=[];
   showScreen('screen-landing');
 }
+
+// ── 截图保存 ──
+function saveAsImage(){
+  const el=document.getElementById('screen-result');
+  const btn=document.querySelector('.result-actions');
+  btn.style.visibility='hidden'; // 截图时隐藏按钮
+  html2canvas(el,{
+    backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#f0ece4',
+    scale: 2,
+    useCORS: true,
+    scrollY: -window.scrollY
+  }).then(canvas=>{
+    btn.style.visibility='visible';
+    const link=document.createElement('a');
+    link.download='NHTI诊断结果.png';
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+    showToast('已保存为图片 ✓');
+  }).catch(()=>{ btn.style.visibility='visible'; showToast('截图失败，请手动截屏'); });
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ── localStorage 上次结果 ──
+function loadPrevResult(){
+  try{
+    const saved=JSON.parse(localStorage.getItem('nhti_result'));
+    if(!saved) return;
+    document.getElementById('pb-code').textContent=saved.label||saved.code;
+    document.getElementById('prev-banner').style.display='flex';
+  }catch(e){}
+}
+
+function viewPrevResult(){
+  try{
+    const saved=JSON.parse(localStorage.getItem('nhti_result'));
+    if(!saved) return;
+    // 恢复 netScores 并直接跳结果页
+    netScores=saved.netScores;
+    showResult();
+  }catch(e){}
+}
+
+// 页面加载时检查上次结果
+window.addEventListener('DOMContentLoaded', loadPrevResult);
 </script>
 </body>
 </html>
